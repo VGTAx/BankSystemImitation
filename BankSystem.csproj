@@ -8,8 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Attributes\Attributes.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="InitHelperInformatMessage">
-      <HintPath>..\..\InitHelperInformatMessage\bin\Release\net6.0\ver 1.0.0.0\InitHelperInformatMessage.dll</HintPath>
+      <HintPath>..\..\InitHelperInformatMessage\bin\Debug\net6.0\InitHelperInformatMessage.dll</HintPath>
     </Reference>
   </ItemGroup>
 

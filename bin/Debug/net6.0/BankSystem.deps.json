@@ -8,17 +8,23 @@
     ".NETCoreApp,Version=v6.0": {
       "BankSystem/1.0.0": {
         "dependencies": {
-          "InitHelperInformatMessage": "1.0.0.0"
+          "Attributes": "1.0.0",
+          "InitHelperInformatMessage": "1.0.0.1"
         },
         "runtime": {
           "BankSystem.dll": {}
         }
       },
-      "InitHelperInformatMessage/1.0.0.0": {
+      "Attributes/1.0.0": {
+        "runtime": {
+          "Attributes.dll": {}
+        }
+      },
+      "InitHelperInformatMessage/1.0.0.1": {
         "runtime": {
           "InitHelperInformatMessage.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
+            "assemblyVersion": "1.0.0.1",
+            "fileVersion": "1.0.0.1"
           }
         }
       }
@@ -30,7 +36,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "InitHelperInformatMessage/1.0.0.0": {
+    "Attributes/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "InitHelperInformatMessage/1.0.0.1": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

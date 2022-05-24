@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace myBank
+namespace BankSystem
 {
     public class Program
     {              

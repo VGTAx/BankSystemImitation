@@ -1,6 +1,7 @@
 ﻿using InitHelperInformatMessage;
+using Attributes;
 
-namespace myBank
+namespace BankSystem
 {
     internal sealed class Bank : IBank
     {
@@ -72,18 +73,15 @@ namespace myBank
         private void SighUp()
         {
             Console.Clear();
-            Account account = new Account();
-            account.doubleMethod += InitializationHelper.DoubleInit;
-            account.stringMethod += InitializationHelper.StringInIt;
+            Account account = new Account();           
             account.RegistrAcc(Accounts);
             Accounts.Add(account);
         }
         /// <summary>
-        /// Login
+        /// Login method
         /// </summary>
         private void SignIn()
         {
-
             Console.Clear();
             int attemptCount = 3;//attemp count
             bool check = false;
@@ -490,5 +488,9 @@ namespace myBank
                 }
             }
         }
+
+
+
+        
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using InitHelperInformatMessage;
 
-namespace myBank
+namespace BankSystem
 {
     internal class Bankomat : IBankomat
     {
