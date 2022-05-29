@@ -1,11 +1,17 @@
 ﻿using InitHelperInformatMessage;
 using Attributes;
+using OfficeOpenXml;
 
 namespace BankSystem
 {
     internal sealed class Bank : IBank
     {
         private delegate void Manage();
+
+        public event Func<string, double>? doubleMethod;
+        public event Func<string, string>? stringMethod;
+        public event Func<string, int>? intMethod;       
+
 
         private Dictionary<int, Manage> DictManageBank;
         private Dictionary<int, Manage> DictManageClient;
@@ -81,12 +87,13 @@ namespace BankSystem
         /// Login method
         /// </summary>
         private void SignIn()
-        {
+        {     
             Console.Clear();
             int attemptCount = 3;//attemp count
             bool check = false;
+            Accounts = LoadListAcc();
             //checking for accounts
-            if (Accounts.Count == 0)
+            if (Accounts == null | Accounts.Count == 0)
             {
                 MessageInformant.ErrorOutput("There is no Account. Sigh Up account first!");
                 check = true;
@@ -127,7 +134,8 @@ namespace BankSystem
         /// Put money into account client
         /// </summary>
         private void AddMoney()
-        {
+        {            
+
             var client = from p in Accounts where p.Authorization == true select p;
 
             foreach (var item in client)
@@ -489,8 +497,54 @@ namespace BankSystem
             }
         }
 
+        public List<IAccount> LoadListAcc()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            
+            List<IAccount> accountsList = new List<IAccount>();
+            try
+            {
+                byte[]? bin = File.ReadAllBytes("ClientInfo.xlsx");
+                MemoryStream memoryStream = new MemoryStream(bin);
+                ExcelPackage excelPackage = new ExcelPackage(memoryStream);
+                ExcelWorksheet clientInfo = excelPackage.Workbook.Worksheets["ClientInfo"];
+                ExcelWorksheet accInfo = excelPackage.Workbook.Worksheets["ClientAccountInfo"];
+
+                
+                if (memoryStream.CanRead)
+                {
+                    for (int i = clientInfo.Dimension.Start.Row + 1; i < clientInfo.Dimension.End.Row + 1; i++)
+                    {
+                        Account temp = new Account();
+                        for (int j = clientInfo.Dimension.Start.Column; j < clientInfo.Dimension.End.Column + 1; j++)
+                        {
+                            if (j == 2)
+                            {
+                                temp.personObj.Name = clientInfo.Cells[i, j].Value.ToString();
+                                temp.Login = accInfo.Cells[i, j].Value.ToString();
+                            }                               
+                            if (j == 3)
+                            {
+                                temp.personObj.SurName = clientInfo.Cells[i, j].Value.ToString();
+                                temp.Password = accInfo.Cells[i, j].Value.ToString();
+                            }                              
+                            if (j == 4)
+                                temp.personObj.Age = int.Parse(clientInfo.Cells[i, j].Value.ToString());
+                        }
+                        accountsList.Add(temp);
+                    }
+                }
+                return accountsList;
+            }
+            catch (Exception)
+            {
+                return accountsList;
+            }
+            
+            
+           
+        }
 
 
-        
     }
 }

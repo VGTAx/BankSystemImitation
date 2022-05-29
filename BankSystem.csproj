@@ -8,12 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Attributes\Attributes.csproj" />
+    <PackageReference Include="EPPlus" Version="6.0.4" />
+    <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Attributes">
+      <HintPath>bin\Debug\net6.0\Attributes.dll</HintPath>
+    </Reference>
     <Reference Include="InitHelperInformatMessage">
-      <HintPath>..\..\InitHelperInformatMessage\bin\Debug\net6.0\InitHelperInformatMessage.dll</HintPath>
+      <HintPath>bin\Debug\net6.0\InitHelperInformatMessage.dll</HintPath>
     </Reference>
   </ItemGroup>
 
