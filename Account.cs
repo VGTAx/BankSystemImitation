@@ -346,12 +346,13 @@ namespace BankSystem
             {
                 excelPackage = new ExcelPackage(memoryStream);
                 ExcelWorksheet? ClientInfoWS = excelPackage.Workbook.Worksheets["ClientInfo"]; 
-                for(int i = ClientInfoWS.Dimension.Start.Row; i <= ClientInfoWS.Dimension.Start.Row; i++)
+                for(int i = ClientInfoWS.Dimension.Start.Row; i <= ClientInfoWS.Dimension.End.Row; i++)
                 {
-                    for (int j = ClientInfoWS.Dimension.Start.Column; j <= ClientInfoWS.Dimension.End.Column; j++)
+                    for (int j = ClientInfoWS.Dimension.Start.Column; j <= ClientInfoWS.Dimension.Start.Column; j++)
                     {
-                        string temp = ClientInfoWS.Cells[j, i].Value.ToString();
-                        //if (temp == newID)                       
+                        string ?temp = ClientInfoWS.Cells[j, i].Value.ToString();
+                        if (int.Parse(temp) == newID)
+                            return false;
                                                   
                     }
                 }                
