@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="6.0.4" />
-    <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>

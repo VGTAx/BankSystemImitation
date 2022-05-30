@@ -20,13 +20,6 @@ namespace BankSystem
             SurName = surName;
         }
         public Person() { }
-        public Person CreatePerson()
-        {
-            Age = InitializationHelper.IntInit("age");
-            Name = InitializationHelper.StringInIt("name");
-            SurName = InitializationHelper.StringInIt("surname");
-            return new Person(Age, Name, SurName);
-        }
 
         public static bool CheckAge(Person person)
         {
@@ -36,7 +29,7 @@ namespace BankSystem
             {
                 if(attr is CheckAgeAttribute checkAge)
                 {
-                    if (checkAge.Age < person.Age)
+                    if (checkAge.Age <= person.Age)
                         return true;
                     MessageInformant.ErrorOutput("Minors cannot open a bank account!");
                     return false;

@@ -7,10 +7,9 @@ namespace BankSystem
     internal sealed class Bank : IBank
     {
         private delegate void Manage();
-
-        public event Func<string, double>? doubleMethod;
-        public event Func<string, string>? stringMethod;
-        public event Func<string, int>? intMethod;       
+        //public event Func<string, double>? doubleMethod;
+        //public event Func<string, string>? stringMethod;
+        //public event Func<string, int>? intMethod;       
 
 
         private Dictionary<int, Manage> DictManageBank;
@@ -68,7 +67,6 @@ namespace BankSystem
             Accounts = acc;
             Bankomats = atm;
         }
-
 
         private string Name { get; set; }
         private List<IAccount> Accounts { get; set; }
@@ -498,9 +496,7 @@ namespace BankSystem
         }
 
         public List<IAccount> LoadListAcc()
-        {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            
+        {    
             List<IAccount> accountsList = new List<IAccount>();
             try
             {
@@ -518,6 +514,10 @@ namespace BankSystem
                         Account temp = new Account();
                         for (int j = clientInfo.Dimension.Start.Column; j < clientInfo.Dimension.End.Column + 1; j++)
                         {
+                            if(j==1)
+                            {
+                                temp.ID = int.Parse(clientInfo.Cells[i, j].Value.ToString());
+                            }
                             if (j == 2)
                             {
                                 temp.personObj.Name = clientInfo.Cells[i, j].Value.ToString();
@@ -530,6 +530,11 @@ namespace BankSystem
                             }                              
                             if (j == 4)
                                 temp.personObj.Age = int.Parse(clientInfo.Cells[i, j].Value.ToString());
+                            if (j == 5)
+                            {
+                                 temp.AmountOfMoney = int.Parse(clientInfo.Cells[i, j]?.Value.ToString());
+                            }
+                               
                         }
                         accountsList.Add(temp);
                     }
@@ -540,9 +545,6 @@ namespace BankSystem
             {
                 return accountsList;
             }
-            
-            
-           
         }
 
 

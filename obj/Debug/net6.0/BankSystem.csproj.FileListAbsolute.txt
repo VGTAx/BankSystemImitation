@@ -53,3 +53,38 @@ E:\VS C#\Bank\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.Sy
 E:\VS C#\Bank\bin\Debug\net6.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
 E:\VS C#\Bank\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
 E:\VS C#\Bank\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Security.Cryptography.Pkcs.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\BankSystem.exe
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\BankSystem.deps.json
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\BankSystem.runtimeconfig.json
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\BankSystem.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\BankSystem.pdb
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\EPPlus.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\EPPlus.Interfaces.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\EPPlus.System.Drawing.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\Microsoft.Extensions.Configuration.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\Microsoft.Extensions.Configuration.Abstractions.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\Microsoft.Extensions.Configuration.FileExtensions.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\Microsoft.Extensions.Configuration.Json.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\Microsoft.Extensions.FileProviders.Abstractions.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\Microsoft.Extensions.FileProviders.Physical.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\Microsoft.Extensions.FileSystemGlobbing.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\Microsoft.Extensions.Primitives.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\Microsoft.IO.RecyclableMemoryStream.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\System.Drawing.Common.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\System.Security.Cryptography.Pkcs.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
+E:\C#\BankSystem\BankSystemImitation\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Security.Cryptography.Pkcs.dll
+E:\C#\BankSystem\BankSystemImitation\obj\Debug\net6.0\BankSystem.csproj.AssemblyReference.cache
+E:\C#\BankSystem\BankSystemImitation\obj\Debug\net6.0\BankSystem.GeneratedMSBuildEditorConfig.editorconfig
+E:\C#\BankSystem\BankSystemImitation\obj\Debug\net6.0\BankSystem.AssemblyInfoInputs.cache
+E:\C#\BankSystem\BankSystemImitation\obj\Debug\net6.0\BankSystem.AssemblyInfo.cs
+E:\C#\BankSystem\BankSystemImitation\obj\Debug\net6.0\BankSystem.csproj.CoreCompileInputs.cache
+E:\C#\BankSystem\BankSystemImitation\obj\Debug\net6.0\BankSystem.csproj.CopyComplete
+E:\C#\BankSystem\BankSystemImitation\obj\Debug\net6.0\BankSystem.dll
+E:\C#\BankSystem\BankSystemImitation\obj\Debug\net6.0\refint\BankSystem.dll
+E:\C#\BankSystem\BankSystemImitation\obj\Debug\net6.0\BankSystem.pdb
+E:\C#\BankSystem\BankSystemImitation\obj\Debug\net6.0\BankSystem.genruntimeconfig.cache
+E:\C#\BankSystem\BankSystemImitation\obj\Debug\net6.0\ref\BankSystem.dll

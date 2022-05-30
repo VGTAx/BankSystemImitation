@@ -17,7 +17,7 @@ namespace BankSystem
         Person personObj { get; set; }
         bool Authorization { get; set; }
 
-        bool checkID(int newID);
+        //bool checkID(int newID);
         double AddMoney(double amount=0);
         double TakeMoney(double amount=0);
         public Account RegistrAcc(List<IAccount> obj);
