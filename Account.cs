@@ -88,7 +88,7 @@ namespace BankSystem
             do
             {
                 Login = InitializationHelper.StringInIt("login account");
-                while(!ExcelMethodGroup.CheckAccAvailable(Login))
+                while(!ExcelMethodGroup.CheckAccNameAvailable(Login))
                 {
                     Login = InitializationHelper.StringInIt("login account");
                 }

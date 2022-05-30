@@ -8,50 +8,20 @@ namespace BankSystem
     {
         public static bool checkID(int newID)
         {
-
-            byte[] bin = File.ReadAllBytes("ClientInfo.xlsx");
-            MemoryStream memoryStream = new MemoryStream(bin);           
-            ExcelPackage excelPackage = new ExcelPackage();
-
-            if (memoryStream.CanRead)
+            try
             {
-                excelPackage = new ExcelPackage(memoryStream);
+                byte[] bin = File.ReadAllBytes("ClientInfo.xlsx");
+                MemoryStream memoryStream = new MemoryStream(bin);                
+                ExcelPackage excelPackage = new ExcelPackage(memoryStream);
                 ExcelWorksheet? ClientInfoWS = excelPackage.Workbook.Worksheets["ClientInfo"];
+
                 for (int i = ClientInfoWS.Dimension.Start.Row + 1; i < ClientInfoWS.Dimension.End.Row; i++)
                 {
                     for (int j = ClientInfoWS.Dimension.Start.Column; j <= ClientInfoWS.Dimension.Start.Column; j++)
                     {
-                        string? temp = ClientInfoWS.Cells[i, j].Value.ToString();
-                        if (int.Parse(temp) == newID)
+                        int tempID = int.Parse(ClientInfoWS.Cells[i, j].Value.ToString());
+                        if (tempID == newID)
                             return false;
-                    }
-                }
-            }
-            return true;
-        }
-        public static bool CheckAccAvailable(string login)
-        {
-            try
-            {
-                ExcelPackage package = new ExcelPackage();
-                byte[] bin = File.ReadAllBytes("ClientInfo.xlsx");
-                MemoryStream memoryStream = new MemoryStream(bin);
-                if (memoryStream.CanRead)
-                {
-                    package = new ExcelPackage(memoryStream);
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets["ClientAccountInfo"];
-
-                    for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
-                    {
-                        for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.Start.Column; j++)
-                        {
-                            string? temp = worksheet.Cells[i, j].Value.ToString();
-                            if (login == temp)
-                            {
-                                MessageInformant.ErrorOutput($"Login \"{login}\" not available");
-                                return false;
-                            }
-                        }
                     }
                 }
                 return true;
@@ -60,10 +30,37 @@ namespace BankSystem
             {
                 return true;
             }
-
-
-
         }
+
+        public static bool CheckAccNameAvailable(string login)
+        {
+            try
+            {                
+                byte[] bin = File.ReadAllBytes("ClientInfo.xlsx");
+                MemoryStream memoryStream = new MemoryStream(bin);
+                ExcelPackage package = new ExcelPackage(memoryStream);
+                ExcelWorksheet worksheet = package.Workbook.Worksheets["ClientAccountInfo"];
+
+                for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
+                {
+                    for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.Start.Column; j++)
+                    {
+                        string? tempLogin = worksheet.Cells[i, j].Value.ToString();
+                        if (login == tempLogin)
+                        {
+                            MessageInformant.ErrorOutput($"Login \"{login}\" not available");
+                            return false;
+                        }
+                    }
+                }               
+                return true;
+            }
+            catch (Exception)
+            {
+                return true;
+            }
+        }
+
         public static void TestExcel(IAccount account)
         {           
             ExcelPackage excelPackage = new ExcelPackage();
@@ -81,27 +78,30 @@ namespace BankSystem
             ExcelWorksheet? ClientInfoWS = excelPackage.Workbook.Worksheets["ClientInfo"];
             ExcelWorksheet? ClientAccInfoWS = excelPackage.Workbook.Worksheets["ClientAccountInfo"];
 
-
             if (ClientInfoWS == null && ClientAccInfoWS == null)
             {
                 ClientInfoWS = excelPackage.Workbook.Worksheets.Add("ClientInfo");
-                var ID = ClientInfoWS.Cells[1, 1];
-                var name = ClientInfoWS.Cells["B1:E1"];
+                var ID = ClientInfoWS.Cells["A1:E1"];
+                var name = ClientInfoWS.Cells[1,2];
                 var surname = ClientInfoWS.Cells[1, 3];
                 var age = ClientInfoWS.Cells[1, 4];
                 var AmountOfMoney = ClientInfoWS.Cells[1, 5];
-
 
                 ClientAccInfoWS = excelPackage.Workbook.Worksheets.Add("ClientAccountInfo");
                 var login = ClientAccInfoWS.Cells["B1:C1"];
                 var password = ClientAccInfoWS.Cells[1, 3];
 
-                name.IsRichText = true;
-                name.Style.WrapText = true;
+                ID.IsRichText = true;
+                ID.Style.WrapText = true;
 
-                var borderName = name.Style.Border.Bottom.Style = name.Style.Border.Right.Style = name.Style.Border.Left.Style = name.Style.Border.Top.Style = ExcelBorderStyle.Medium;
+                ID.Style.Border.Bottom.Style = ID.Style.Border.Right.Style =
+                    ID.Style.Border.Left.Style = ID.Style.Border.Top.Style = ExcelBorderStyle.Medium;                
 
                 var titleID = ID.RichText.Add("ID");
+                titleID.Bold = true;
+                titleID.FontName = "Calibri";
+                titleID.Size = 14;
+
                 var titleName = name.RichText.Add("Name");
                 var titleSurname = surname.RichText.Add("Surname");
                 var titleAge = age.RichText.Add("Age");
@@ -109,12 +109,8 @@ namespace BankSystem
                 var titleLogin = login.RichText.Add("Login");
                 var titlePassword = password.RichText.Add("Password");
 
-                titleName.Bold = true;
-                titleName.FontName = "Cambria";
-                titleName.Size = 14;
-
-                List<ExcelRichText> list = new List<ExcelRichText>();
-                list.Add(titleID);
+                List<ExcelRichText> list = new List<ExcelRichText>();              
+                list.Add(titleName);
                 list.Add(titleAge);
                 list.Add(titleSurname);
                 list.Add(titleAmountOfMoney);
@@ -123,11 +119,10 @@ namespace BankSystem
 
                 foreach (var item in list)
                 {
-                    item.Bold = titleName.Bold;
-                    item.FontName = titleName.FontName;
-                    item.Size = 14;
+                    item.Bold = titleID.Bold;
+                    item.FontName = titleID.FontName;
+                    item.Size = titleID.Size;
                 }
-
             }
 
             int rowClient = 1;
@@ -159,7 +154,6 @@ namespace BankSystem
             ClientAccInfoWS.Cells[rowAccount, 2].Value = account.Login;
             ClientAccInfoWS.Cells[rowAccount, 3].Value = account.Password;
 
-
             excelPackage.SaveAs("ClientInfo.xlsx");
         }
 
@@ -171,6 +165,7 @@ namespace BankSystem
             MemoryStream memoryStream = new MemoryStream(bin);
             ExcelPackage package1 = new ExcelPackage(memoryStream);
             ExcelWorksheet worksheet = package1.Workbook.Worksheets["ClientInfo"];
+
             for (int i = worksheet.Dimension.Start.Row + 1; i < worksheet.Dimension.End.Row; i++)
             {
                 for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.Start.Column; j++)
@@ -181,14 +176,12 @@ namespace BankSystem
                         tempRow = i;
                     }
                 }
-            }
-            FileInfo fileInfo = new FileInfo("ClientInfo.xlsx");
-            if (fileInfo.Exists)
-            {
-                worksheet.Cells[tempRow, 5].Value = (amountMoney -= tempAmountMoney);
-                package1.SaveAs("ClientInfo.xlsx");
-            }
+            }           
+
+            worksheet.Cells[tempRow, 5].Value = (amountMoney -= tempAmountMoney);
+            package1.SaveAs("ClientInfo.xlsx");
             MessageInformant.SuccessOutput($"Money withdrawn {tempAmountMoney} BYN");
+            
             return amountMoney;
         }
         
