@@ -13,10 +13,6 @@ namespace BankSystem
     [CheckLengthLoginPassword(20)]  
     internal class Account : IAccount
     {        
-        //public event Func<string, double> ?doubleMethod;
-        //public event Func<string, string> ?stringMethod;
-        //public event Func<string,int> ?intMethod;
-
         public Account()
         {
             personObj = new Person();
