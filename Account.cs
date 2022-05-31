@@ -88,7 +88,7 @@ namespace BankSystem
             do
             {
                 Login = InitializationHelper.StringInIt("login account");
-                while(!ExcelMethodGroup.CheckAccNameAvailable(Login))
+                while(!ExcelMethodGroup.CheckAccNameAvailableXLSX(Login))
                 {
                     Login = InitializationHelper.StringInIt("login account");
                 }
@@ -116,8 +116,11 @@ namespace BankSystem
             }
             while (CheckLength(new Account(personObj, Password, Login, 0,ID))==false);
             
+            
+            ExcelMethodGroup.EWorksheetAccountXLSX(new Account(personObj, Password, Login, 0, ID));
             MessageInformant.SuccessOutput("Account registered!");
-            ExcelMethodGroup.TestExcel(new Account(personObj, Password, Login, 0, ID));
+            Console.ReadLine();
+            Console.Clear();
             return new Account(personObj, Password, Login, 0, ID);
         }
        
@@ -151,7 +154,8 @@ namespace BankSystem
                     ClientInfoWS.Cells[rowClient, 5].Value = 
                         AmountOfMoney += InitializationHelper.DoubleInit("sum of money to add"); 
                     excelPackage.SaveAs("ClientInfo.xlsx");
-                    
+                    MessageInformant.SuccessOutput($"Money added");
+                    Console.ReadLine();
                     return AmountOfMoney;
                 }
                 else
@@ -189,7 +193,7 @@ namespace BankSystem
                         tempDesAmount = InitializationHelper.DoubleInit("sum of money to withdraw");
                     }
                 }
-                return AmountOfMoney = ExcelMethodGroup.WithDrawMoney(this, AmountOfMoney, tempDesAmount);                
+                return AmountOfMoney = ExcelMethodGroup.WithdrawMoneyXLSX(this, AmountOfMoney, tempDesAmount);                
             }
             //money check
             if (desiredAmount > AmountOfMoney)
@@ -197,8 +201,8 @@ namespace BankSystem
                 MessageInformant.ErrorOutput($"Not enough money. You have {AmountOfMoney} BYN");
                 return -1;
             }
-            else
-                return AmountOfMoney = ExcelMethodGroup.WithDrawMoney(this, AmountOfMoney, desiredAmount);
+            else                
+                return AmountOfMoney = ExcelMethodGroup.WithdrawMoneyXLSX(this, AmountOfMoney, desiredAmount);
         }
 
         private static bool CheckLength(Account account)

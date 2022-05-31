@@ -1,16 +1,10 @@
 ﻿using InitHelperInformatMessage;
-using Attributes;
-using OfficeOpenXml;
 
 namespace BankSystem
 {
     internal sealed class Bank : IBank
     {
         private delegate void Manage();
-        //public event Func<string, double>? doubleMethod;
-        //public event Func<string, string>? stringMethod;
-        //public event Func<string, int>? intMethod;       
-
 
         private Dictionary<int, Manage> DictManageBank;
         private Dictionary<int, Manage> DictManageClient;
@@ -77,7 +71,7 @@ namespace BankSystem
         private void SighUp()
         {
             Console.Clear();
-            Account account = new Account();           
+            Account account = new Account();
             account.RegistrAcc(Accounts);
             Accounts.Add(account);
         }
@@ -85,11 +79,11 @@ namespace BankSystem
         /// Login method
         /// </summary>
         private void SignIn()
-        {     
+        {
             Console.Clear();
             int attemptCount = 3;//attemp count
             bool check = false;
-            Accounts = LoadListAcc();
+            Accounts = ExcelMethodGroup.LoadListAccXLSX();
             //checking for accounts
             if (Accounts == null | Accounts.Count == 0)
             {
@@ -132,7 +126,7 @@ namespace BankSystem
         /// Put money into account client
         /// </summary>
         private void AddMoney()
-        {            
+        {
 
             var client = from p in Accounts where p.Authorization == true select p;
 
@@ -158,25 +152,29 @@ namespace BankSystem
                     while (true)
                     {
                         //select where withdraw money
-                        string enter = InitializationHelper.StringInIt("Select where do you wish to withdraw money:\n" +
-                        "1.Bank\n2.ATM");
+                        Console.Write("Select where do you wish to withdraw money:\n1.Bank\n2.ATM\n");
+                        string enter = Console.ReadLine();
                         switch (enter)
                         {
                             case "1":
                                 accAUTH.TakeMoney();
+                                MessageInformant.SuccessOutput($"Money withdrawn");
+                                Console.ReadLine();
                                 break;
                             case "2":
                                 while (true)
                                 {   //checking if the bank has ATM
+                                    Bankomats = ExcelMethodGroup.LoadListAtmXLSX();
                                     if (Bankomats.Count == 0)
                                     {
                                         MessageInformant.ErrorOutput("There is no ATM. Add ATM first!");
-                                        Thread.Sleep(1000);
+                                        Console.ReadLine();
                                         break;
                                     }
 
                                     while (true)
                                     {   //get list ATM
+
                                         foreach (var atm in Bankomats)
                                         {
                                             atm.Info();
@@ -190,6 +188,8 @@ namespace BankSystem
                                         foreach (var authATM in atmSelect)
                                         {
                                             authATM.WithdrawMoney(accAUTH);
+                                            MessageInformant.SuccessOutput($"Money withdrawn");
+                                            Console.ReadLine();
                                         }
                                         if (atmSelect.Any())
                                         {
@@ -197,7 +197,7 @@ namespace BankSystem
                                         }
 
                                         MessageInformant.ErrorOutput("Invalid ATM Number!");
-                                        Thread.Sleep(750);
+                                        Console.ReadLine();
                                         Console.Clear();
                                     }
                                     break;
@@ -211,7 +211,7 @@ namespace BankSystem
                 {
                     //while client has not money
                     MessageInformant.ErrorOutput($"You have {accAUTH.AmountOfMoney} BYN. Top up your account!");
-                    Thread.Sleep(1000);
+                    Console.ReadLine();
                 }
             }
         }
@@ -247,7 +247,7 @@ namespace BankSystem
         private void GetAllATM()
         {
             Console.Clear();
-
+            Bankomats = ExcelMethodGroup.LoadListAtmXLSX();
             if (Bankomats.Count != 0)
             {
                 var listATM = from p in Bankomats select p;
@@ -258,7 +258,11 @@ namespace BankSystem
                 }
             }
             else
+            {
                 MessageInformant.ErrorOutput("There is no ATM. Add ATM first!");
+                Console.ReadLine();
+                Console.Clear();
+            }
         }
         /// <summary>
         /// Load money into ATM
@@ -266,10 +270,10 @@ namespace BankSystem
         private void LoadMoneyATM()
         {
             bool check = false;
+            Bankomats = ExcelMethodGroup.LoadListAtmXLSX();
             while (Bankomats.Count != 0)
             {
                 GetAllATM();
-
                 Console.WriteLine();
                 int ATM = (int)InitializationHelper.DoubleInit("number ATM");
 
@@ -284,18 +288,20 @@ namespace BankSystem
                 if (check)
                 {
                     MessageInformant.SuccessOutput("Money load into the ATM!");
+                    Console.ReadLine();
+                    Console.Clear();
                     break;
                 }
                 else
                 {
                     MessageInformant.ErrorOutput("Invalid number ATM");
-                    Thread.Sleep(500);
+                    Console.ReadLine();
                 }
             }
             if (Bankomats.Count == 0)
             {
                 MessageInformant.ErrorOutput("There is no ATM. Add ATM first!");
-                Thread.Sleep(950);
+                Console.ReadLine();
                 Console.Clear();
             }
         }
@@ -480,7 +486,11 @@ namespace BankSystem
                 if (result && select == 0)
                 {
                     Console.Clear();
-                    break;
+                    string temp = InitializationHelper.StringInIt("\"Y\" or \"y\" to exit or " +
+                        "press any button to continue");
+                    if (temp == "Y")
+                        break;
+                    continue;
                 }
                 //passing selected method to delegate
                 if (result && EnumManageMain.Length > select)
@@ -490,63 +500,9 @@ namespace BankSystem
                 else
                 {
                     MessageInformant.ErrorOutput("Invalid select");
-                    Thread.Sleep(400);
+                    Console.ReadLine();
                 }
             }
         }
-
-        public List<IAccount> LoadListAcc()
-        {    
-            List<IAccount> accountsList = new List<IAccount>();
-            try
-            {
-                byte[]? bin = File.ReadAllBytes("ClientInfo.xlsx");
-                MemoryStream memoryStream = new MemoryStream(bin);
-                ExcelPackage excelPackage = new ExcelPackage(memoryStream);
-                ExcelWorksheet clientInfo = excelPackage.Workbook.Worksheets["ClientInfo"];
-                ExcelWorksheet accInfo = excelPackage.Workbook.Worksheets["ClientAccountInfo"];
-
-                
-                if (memoryStream.CanRead)
-                {
-                    for (int i = clientInfo.Dimension.Start.Row + 1; i < clientInfo.Dimension.End.Row + 1; i++)
-                    {
-                        Account temp = new Account();
-                        for (int j = clientInfo.Dimension.Start.Column; j < clientInfo.Dimension.End.Column + 1; j++)
-                        {
-                            if(j==1)
-                            {
-                                temp.ID = int.Parse(clientInfo.Cells[i, j].Value.ToString());
-                            }
-                            if (j == 2)
-                            {
-                                temp.personObj.Name = clientInfo.Cells[i, j].Value.ToString();
-                                temp.Login = accInfo.Cells[i, j].Value.ToString();
-                            }                               
-                            if (j == 3)
-                            {
-                                temp.personObj.SurName = clientInfo.Cells[i, j].Value.ToString();
-                                temp.Password = accInfo.Cells[i, j].Value.ToString();
-                            }                              
-                            if (j == 4)
-                                temp.personObj.Age = int.Parse(clientInfo.Cells[i, j].Value.ToString());
-                            if (j == 5)
-                            {
-                                 temp.AmountOfMoney = int.Parse(clientInfo.Cells[i, j]?.Value.ToString());
-                            }
-                               
-                        }
-                        accountsList.Add(temp);
-                    }
-                }
-                return accountsList;
-            }
-            catch (Exception)
-            {
-                return accountsList;
-            }
-        }
-
-
     }
 }

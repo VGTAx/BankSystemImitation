@@ -8,8 +8,7 @@ namespace BankSystem
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             Bank bank = new Bank();
-            bank.ManageMain();
-            Console.ReadLine();
+            bank.ManageMain();            
         }
     }
 }

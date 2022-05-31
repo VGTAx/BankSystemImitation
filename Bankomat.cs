@@ -1,4 +1,5 @@
 ﻿using InitHelperInformatMessage;
+using OfficeOpenXml;
 
 namespace BankSystem
 {
@@ -23,6 +24,25 @@ namespace BankSystem
         public void LoadMoney()
         {
             AmountOfMoneyATM += InitializationHelper.DoubleInit("the amount of money to load into the ATM");
+            FileInfo fileInfo = new FileInfo("ATMInfo.xlsx");
+            ExcelPackage packageATM = new ExcelPackage(fileInfo);
+            ExcelWorksheet worksheetATM = packageATM.Workbook.Worksheets["ATM Info"];
+
+            int rowNumber = 0;
+            for (int i = worksheetATM.Dimension.Start.Row+1; i <= worksheetATM.Dimension.End.Row; i++)
+            {
+                for (int j = worksheetATM.Dimension.Start.Column; j <= worksheetATM.Dimension.Start.Column; j++)
+                {
+                    int tempNumberATM = int.Parse(worksheetATM.Cells[i, j].Value.ToString());
+                    if (tempNumberATM == NumberATM)
+                    {
+                        rowNumber = i;
+                    }                    
+                }
+            }
+            worksheetATM.Cells[rowNumber, 3].Value = AmountOfMoneyATM;
+            packageATM.SaveAs("ATMInfo.xlsx");
+
         }
         /// <summary>
         /// Create ATM
@@ -32,17 +52,11 @@ namespace BankSystem
         public Bankomat CreateATM(List<IBankomat> bankomats)
         {
             Adress = InitializationHelper.StringInIt("adress ATM");
-            AmountOfMoneyATM = InitializationHelper.DoubleInit("amount of money");
-            NumberATM = (int)InitializationHelper.DoubleInit("number ATM");
-
-            foreach (var itLog in bankomats)
-            {
-                while (NumberATM == itLog.NumberATM)
-                {
-                    MessageInformant.ErrorOutput($"Number ATM \"{NumberATM}\" not available");
-                    NumberATM = (int)InitializationHelper.DoubleInit("number ATM");
-                }
-            }
+            AmountOfMoneyATM = InitializationHelper.DoubleInit("amount of money");           
+            NumberATM = new Random().Next(1, 999);            
+            ExcelMethodGroup.ExcelWorksheetAtmXLSX(new Bankomat(Adress, AmountOfMoneyATM, NumberATM));
+            MessageInformant.SuccessOutput("ATM Added");
+            Console.ReadLine();
             return new Bankomat(Adress, AmountOfMoneyATM, NumberATM);
         }
         /// <summary>
@@ -51,8 +65,9 @@ namespace BankSystem
         public void Info()
         {
             Console.WriteLine($"Adress: {Adress}");
-            //Color for different amount of money
-            //Red <3000, Yellow >3000&&<7000, Green>7000
+
+            ///Color for different amount of money
+            ///Red <3000, Yellow >3000&&<7000, Green>7000
             if (AmountOfMoneyATM < 3000)
             {
                 Console.Write($"Amount of money in ATM: ");
@@ -79,6 +94,7 @@ namespace BankSystem
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($" №{NumberATM}");
             Console.ResetColor();
+            Console.WriteLine();
         }
         /// <summary>
         /// Withdraw money from ATM
@@ -105,7 +121,8 @@ namespace BankSystem
 
                 if (tempDesAmount > AmountOfMoneyATM && AmountOfMoneyATM != 0)
                 {
-                    MessageInformant.ErrorOutput($"There is not enough money in the ATM.Enter other amount of money");
+                    MessageInformant.ErrorOutput($"There is not enough money in the ATM.Enter other amount of money" +
+                        $". Available amount of money {AmountOfMoneyATM} BYN");
                     check = false;
                     continue;
                 }
@@ -130,8 +147,7 @@ namespace BankSystem
             }
             if (check)
             {
-                AmountOfMoneyATM = ExcelMethodGroup.WithDrawMoney(account, AmountOfMoneyATM, tempDesAmount);
-                MessageInformant.SuccessOutput($"Money withdrawn {tempDesAmount} BYN");
+                AmountOfMoneyATM = ExcelMethodGroup.WithdrawMoneyAtmXLSX(this, AmountOfMoneyATM, tempDesAmount);                
                 account.TakeMoney(tempDesAmount);  
             }
         }
