@@ -275,7 +275,7 @@ namespace BankSystem
             {
                 GetAllATM();
                 Console.WriteLine();
-                int ATM = (int)InitializationHelper.DoubleInit("number ATM");
+                int ATM = InitializationHelper.IntInit("number ATM!");
 
                 var selectATM = from p in Bankomats where p.NumberATM == ATM select p;//search entered ATM
 
@@ -294,7 +294,7 @@ namespace BankSystem
                 }
                 else
                 {
-                    MessageInformant.ErrorOutput("Invalid number ATM");
+                    MessageInformant.ErrorOutput("Invalid number ATM!");
                     Console.ReadLine();
                 }
             }

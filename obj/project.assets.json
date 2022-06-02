@@ -804,30 +804,26 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Putin\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Toshka\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\C#\\BankSystem\\BankSystemImitation\\BankSystem.csproj",
+      "projectUniqueName": "E:\\VS C#\\Bank\\BankSystem.csproj",
       "projectName": "BankSystem",
-      "projectPath": "E:\\C#\\BankSystem\\BankSystemImitation\\BankSystem.csproj",
-      "packagesPath": "C:\\Users\\Putin\\.nuget\\packages\\",
-      "outputPath": "E:\\C#\\BankSystem\\BankSystemImitation\\obj\\",
+      "projectPath": "E:\\VS C#\\Bank\\BankSystem.csproj",
+      "packagesPath": "C:\\Users\\Toshka\\.nuget\\packages\\",
+      "outputPath": "E:\\VS C#\\Bank\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\Putin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\Toshka\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -866,7 +862,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.300\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
       }
     }
   }

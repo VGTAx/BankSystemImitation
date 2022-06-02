@@ -1,6 +1,7 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using InitHelperInformatMessage;
+using System.Drawing;
 
 namespace BankSystem
 {
@@ -123,19 +124,14 @@ namespace BankSystem
                 }
             }
 
-            int rowClient = 1;
-            int rowAccount = 1;
+            int rowClientWS = ClientInfoWS.Dimension.End.Row + 1;
+            int colClientWS = ClientInfoWS.Columns.EndColumn;
+           
+            int rowAccountWS = ClientAccInfoWS.Dimension.End.Row+1;
+            int colAccountWS = ClientAccInfoWS.Columns.EndColumn;
+            
 
-            for (int i = ClientInfoWS.Dimension.Start.Row; i <= ClientInfoWS.Dimension.End.Row; i++)
-            {
-                rowClient++;
-            }
-            for (int i = ClientAccInfoWS.Dimension.Start.Row; i <= ClientAccInfoWS.Dimension.End.Row; i++)
-            {
-                rowAccount++;
-            }
-
-            if (rowClient > 2)
+            if (rowClientWS > 2)
             {
                 CheckInfoXLSX(account.ID,"ClientInfo.xlsx","ClientInfo");
                 while (CheckInfoXLSX(account.ID, "ClientInfo.xlsx", "ClientInfo") == false)
@@ -144,13 +140,22 @@ namespace BankSystem
                 }
             }
 
-            ClientInfoWS.Cells[rowClient, 1].Value = account.ID;
-            ClientInfoWS.Cells[rowClient, 2].Value = account.personObj.Name;
-            ClientInfoWS.Cells[rowClient, 3].Value = account.personObj.SurName;
-            ClientInfoWS.Cells[rowClient, 4].Value = account.personObj.Age;
-            ClientInfoWS.Cells[rowClient, 5].Value = account.AmountOfMoney;
-            ClientAccInfoWS.Cells[rowAccount, 2].Value = account.Login;
-            ClientAccInfoWS.Cells[rowAccount, 3].Value = account.Password;
+            ClientAccInfoWS.Cells[ClientAccInfoWS.Dimension.Address].AutoFitColumns(15,20);          
+            ClientInfoWS.Cells["A1:A10000"].AutoFitColumns(4);
+            ClientInfoWS.Cells["B1:B10000"].AutoFitColumns(20);
+            ClientInfoWS.Cells["C1:C10000"].AutoFitColumns(20);
+            ClientInfoWS.Cells["D1:D10000"].AutoFitColumns(6);
+            ClientInfoWS.Cells["E1:E10000"].AutoFitColumns(10);
+
+
+
+            ClientInfoWS.Cells[rowClientWS, 1].Value = account.ID;
+            ClientInfoWS.Cells[rowClientWS, 2].Value = account.personObj.Name;
+            ClientInfoWS.Cells[rowClientWS, 3].Value = account.personObj.SurName;
+            ClientInfoWS.Cells[rowClientWS, 4].Value = account.personObj.Age;
+            ClientInfoWS.Cells[rowClientWS, 5].Value = account.AmountOfMoney;
+            ClientAccInfoWS.Cells[rowAccountWS, 2].Value = account.Login;
+            ClientAccInfoWS.Cells[rowAccountWS, 3].Value = account.Password;
 
             excelPackage.SaveAs("ClientInfo.xlsx");
         }
@@ -210,29 +215,36 @@ namespace BankSystem
             packageATM.Workbook.Properties.Created = DateTime.Now;
 
             FileInfo fileInfo = new FileInfo("ATMInfo.xlsx");
-            if(fileInfo.Exists)
+            if (fileInfo.Exists)
             {
                 packageATM = new ExcelPackage(fileInfo);
             }
 
             ExcelWorksheet? worksheetATM = packageATM.Workbook.Worksheets["ATM Info"];
 
-            if(worksheetATM == null)
+            int rowWS = 0;
+            int colWS = 0;
+
+            if (worksheetATM != null)
             {
+                rowWS = worksheetATM.Dimension.End.Row+1;
+                colWS = worksheetATM.Columns.EndColumn;
+            }            
+
+            if (worksheetATM == null)
+            {               
                 worksheetATM = packageATM.Workbook.Worksheets.Add("ATM Info");
                 var numberATM = worksheetATM.Cells["A1"];
                 var adressATM = worksheetATM.Cells["B1"];
-                var MoneyATM = worksheetATM.Cells["C1"];
+                var MoneyATM = worksheetATM.Cells["C1"];                
 
                 numberATM.IsRichText = true;
-                numberATM.Style.WrapText = true;
-                numberATM.Style.Border.Bottom.Style = numberATM.Style.Border.Top.Style =
-                    numberATM.Style.Border.Right.Style = numberATM.Style.Border.Left.Style = ExcelBorderStyle.Medium;
+                numberATM.Style.WrapText = true;                
 
                 var titleNumberATM = numberATM.RichText.Add("№ ATM");
                 titleNumberATM.Bold = true;
                 titleNumberATM.FontName = "Calibri";
-                titleNumberATM.Size = 14;
+                titleNumberATM.Size = 16;
 
                 var titleAdressATM = adressATM.RichText.Add("Adress ATM");
                 var titleMoneyATM = MoneyATM.RichText.Add("Amount of money");
@@ -249,15 +261,12 @@ namespace BankSystem
                     item.FontName = titleNumberATM.FontName;
                     item.Size = titleNumberATM.Size;
                 }
-            }
 
-            int rowClient = 1;
-
-            for (int i = worksheetATM.Dimension.Start.Row; i <= worksheetATM.Dimension.End.Row; i++)
-            {
-                rowClient++;
+                rowWS = worksheetATM.Dimension.End.Row + 1;
+                colWS = worksheetATM.Columns.EndColumn;
             }
-            if (rowClient > 2)
+            
+            if (rowWS > 2)
             {
                 CheckInfoXLSX(bankomat.NumberATM, "ATMInfo.xlsx", "ATM Info");
                 while (CheckInfoXLSX(bankomat.NumberATM, "ATMInfo.xlsx", "ATM Info") == false)
@@ -266,10 +275,31 @@ namespace BankSystem
                 }
             }
 
-            worksheetATM.Cells[rowClient,1].Value = bankomat.NumberATM;
-            worksheetATM.Cells[rowClient, 2].Value = bankomat.Adress;
-            worksheetATM.Cells[rowClient, 3].Value = bankomat.AmountOfMoneyATM;
+            worksheetATM.Cells[1, 1, 1, colWS].Style.Border.Right.Style = ExcelBorderStyle.Medium;
+            worksheetATM.Cells[1, 1, 1, colWS].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+            worksheetATM.Cells[1, 1, 1, colWS].Style.Border.Left.Style = ExcelBorderStyle.Medium;
+            worksheetATM.Cells[1, 1, rowWS, colWS].Style.Font.Size = 12;
 
+            worksheetATM.Cells[1, 1, rowWS, 1].AutoFitColumns(8);
+            worksheetATM.Cells[1, 2, rowWS, 2].AutoFitColumns(32);
+            worksheetATM.Cells[1, 3, rowWS, 3].AutoFitColumns(15);            
+
+            worksheetATM.Columns[1, colWS].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            worksheetATM.Columns[1, colWS].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheetATM.Columns[1, colWS].Style.WrapText = true;
+
+            worksheetATM.Cells[2, 1, rowWS, colWS].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+            worksheetATM.Cells[2, 1, rowWS, colWS].Style.Border.Right.Style = ExcelBorderStyle.Medium;                                
+            worksheetATM.Cells[2, 1, rowWS, colWS].Style.Border.Left.Style = ExcelBorderStyle.Medium;           
+
+            worksheetATM.Cells[2, 3, rowWS, 3].Style.Font.Bold = true;
+            worksheetATM.Cells[2, 3, rowWS, 3].Style.Font.Color.SetColor(Color.Red);
+
+            worksheetATM.Cells[rowWS, 1].Value = bankomat.NumberATM;
+            worksheetATM.Cells[rowWS, 2].Value = bankomat.Adress;
+            worksheetATM.Cells[rowWS, 3].Value = bankomat.AmountOfMoneyATM;
+
+            
             packageATM.SaveAs("ATMInfo.xlsx");
         }
         public static List<IAccount> LoadListAccXLSX()

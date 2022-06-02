@@ -29,15 +29,17 @@ namespace BankSystem
             {
                 if(attr is CheckAgeAttribute checkAge)
                 {
-                    if (checkAge.Age <= person.Age)
-                        if (100 <= checkAge.Age)
+                    if (checkAge.Age < person.Age)
+                    {                        
+                        if (100 > person.Age)
                             return true;
                         else
                         {
                             MessageInformant.ErrorOutput($"Incorrect value! Age must be" +
                                     $" more {checkAge.Age} and less {100}");
                             return false;
-                        }  
+                        }                        
+                    }
                     MessageInformant.ErrorOutput("Minors cannot open a bank account!");
                     return false;
                 }
