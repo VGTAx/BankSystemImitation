@@ -9,45 +9,7 @@ namespace BankSystem
         private Dictionary<int, Manage> DictManageBank;
         private Dictionary<int, Manage> DictManageClient;
         private Dictionary<int, Manage> DictManageMain;
-        private Dictionary<int, Manage> DictManageAccountClient;
-        /// <summary>
-        /// Enum of methods for manage account of client
-        /// </summary>
-        private enum EnumManageAccountClient
-        {
-            AddMoney = 1,
-            TakeMoney = 2,
-            GetInfo,
-            Back = 0
-        }
-        /// <summary>
-        /// Enum of methods for manage bank
-        /// </summary>
-        private enum EnumManageBank
-        {
-            AddATM = 1,
-            GetAllATM,
-            LoadMoneyATM,
-            Back = 0
-        };
-        /// <summary>
-        /// Enum of methods for Main menu
-        /// </summary>
-        private enum EnumManageMain
-        {
-            Client = 1,
-            Bank = 2,
-            Exit = 0
-        };
-        /// <summary>
-        /// Enum of methods to start working with a client account
-        /// </summary>
-        private enum EnumManageClient
-        {
-            SighUp = 1,
-            SignIn,
-            Back = 0
-        }
+        private Dictionary<int, Manage> DictManageAccountClient;        
 
         public Bank()
         {
@@ -73,7 +35,7 @@ namespace BankSystem
             Console.Clear();
             Account account = new Account();
             account.RegistrAcc(Accounts);
-            Accounts.Add(account);
+            Accounts.Add(new Account());
         }
         /// <summary>
         /// Login method
@@ -133,7 +95,7 @@ namespace BankSystem
             foreach (var item in client)
             {
                 item.AddMoney();
-                MessageInformant.SuccessOutput("Money added to account!");
+                //MessageInformant.SuccessOutput("Money added to account!");
             }
         }
         /// <summary>
@@ -158,7 +120,7 @@ namespace BankSystem
                         {
                             case "1":
                                 accAUTH.TakeMoney();
-                                MessageInformant.SuccessOutput($"Money withdrawn");
+                                MessageInformant.SuccessOutput($"Money withdrawn!");
                                 Console.ReadLine();
                                 break;
                             case "2":
@@ -173,8 +135,8 @@ namespace BankSystem
                                     }
 
                                     while (true)
-                                    {   //get list ATM
-
+                                    {   
+                                        //get list ATM
                                         foreach (var atm in Bankomats)
                                         {
                                             atm.Info();
@@ -188,7 +150,7 @@ namespace BankSystem
                                         foreach (var authATM in atmSelect)
                                         {
                                             authATM.WithdrawMoney(accAUTH);
-                                            MessageInformant.SuccessOutput($"Money withdrawn");
+                                            MessageInformant.SuccessOutput($"Money withdrawn!");
                                             Console.ReadLine();
                                         }
                                         if (atmSelect.Any())
@@ -275,7 +237,7 @@ namespace BankSystem
             {
                 GetAllATM();
                 Console.WriteLine();
-                int ATM = InitializationHelper.IntInit("number ATM!");
+                int ATM = InitializationHelper.IntInit("number ATM");
 
                 var selectATM = from p in Bankomats where p.NumberATM == ATM select p;//search entered ATM
 
