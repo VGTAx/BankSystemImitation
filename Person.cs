@@ -29,7 +29,7 @@ namespace BankSystem
             {
                 if(attr is CheckAgeAttribute checkAge)
                 {
-                    if (checkAge.Age < person.Age)
+                    if (checkAge.Age <= person.Age)
                     {                        
                         if (100 > person.Age)
                             return true;

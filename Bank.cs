@@ -177,7 +177,7 @@ namespace BankSystem
                     Console.ReadLine();
                 }
             }            
-            Thread.Sleep(5000);
+            
         }
         /// <summary>
         /// Get information about the client
