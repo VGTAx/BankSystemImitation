@@ -9,22 +9,22 @@ namespace BankSystem
     /// </summary>
 
     [CheckLengthLoginPassword(20)]
-    internal class Account : IAccount
+    public class Account : IAccount
     {
         public Account()
         {
-            personObj = new Person();
+            person = new Person();
         }
         public Account(Person person, string password, string login, double sum, int iD)
         {
             ID = iD;
-            personObj = person;
+            this.person = person;
             Login = login;
             Password = password;
             AmountOfMoney = sum;
         }
 
-        public Person personObj { get; set; }
+        public Person person { get; set; }
         public string Password { get; set; }
         public string Login { get; set; }
         public int ID { get; set; }
@@ -41,11 +41,11 @@ namespace BankSystem
         {
             Console.Clear();
             Console.WriteLine($"Account Info:\n");
-            personObj.Info();
+            person.Info();
             Console.WriteLine($"Amount of money - {AmountOfMoney} BYN");
             Console.ReadLine();
 
-            return $"{personObj.Info}\nAmount of money - {AmountOfMoney} BYN";
+            return $"{person.Info}\nAmount of money - {AmountOfMoney} BYN";
         }
 
         /// <summary>
@@ -77,20 +77,20 @@ namespace BankSystem
                 Random rand = new Random();
                 ID = rand.Next(1, 10000);
 
-                personObj = new Person(agePerson, namePerson, surnamePerson);
-                while (!Person.CheckAge(personObj))
+                person = new Person(agePerson, namePerson, surnamePerson);
+                while (!Person.CheckAge(person))
                 {
                     agePerson = InitializationHelper.IntInit("age");
-                    personObj = new Person(agePerson, namePerson, surnamePerson);
+                    person = new Person(agePerson, namePerson, surnamePerson);
                 }
             }
-            while (CheckLength(new Account(personObj, Password, Login, 0, ID)) == false);
+            while (CheckLength(new Account(person, Password, Login, 0, ID)) == false);
 
-            ExcelMethodGroup.WorksheetAccountXLSX(new Account(personObj, Password, Login, 0, ID));
+            ExcelMethodGroup.WorksheetAccountXLSXAsync(new Account(person, Password, Login, 0, ID));
             MessageInformant.SuccessOutput("Account registered!");
             Console.ReadLine();
             Console.Clear();
-            return new Account(personObj, Password, Login, 0, ID);
+            return new Account(person, Password, Login, 0, ID);
         }
 
         /// <summary>
@@ -130,7 +130,8 @@ namespace BankSystem
                 else
                 {
                     ClientInfoWS.Cells[rowClient, 5].Value = AmountOfMoney += amount;
-                    excelPackage.SaveAs("ClientInfo.xlsx", ExcelMethodGroup.SetPassword("PasswordClient.xlsx", "password"));
+                    excelPackage.SaveAs("ClientInfo.xlsx", 
+                        ExcelMethodGroup.SetPassword("PasswordClient.xlsx", "password"));
                     return AmountOfMoney;
                 }
             }
@@ -142,6 +143,40 @@ namespace BankSystem
         /// </summary>
         /// <param name="desiredAmount"></param>
         /// <returns></returns>
+        public async Task <double> TakeMoneyAsync(double desiredAmount = 0)
+        {
+            //money check
+            if (desiredAmount == 0)
+            {
+                double tempDesAmount = InitializationHelper.DoubleInit("sum of money to withdraw");
+
+                while (tempDesAmount == 0 || tempDesAmount > AmountOfMoney)
+                {
+                    if (tempDesAmount == 0)//while try to withdraw 0 BYN
+                    {
+                        MessageInformant.ErrorOutput($"Can't withdraw 0 BYN");
+                        tempDesAmount = InitializationHelper.DoubleInit("sum of money to withdraw");
+                    }
+                    else//while not enough money
+                    {
+                        MessageInformant.ErrorOutput($"Not enough money. You have {AmountOfMoney} BYN");
+                        tempDesAmount = InitializationHelper.DoubleInit("sum of money to withdraw");
+                    }
+                }
+                return AmountOfMoney = await Task.Run(()=>
+                                        ExcelMethodGroup.WithdrawMoneyXLSXAsync(this, AmountOfMoney, tempDesAmount));
+            }
+            //money check
+            if (desiredAmount > AmountOfMoney)
+            {
+                MessageInformant.ErrorOutput($"Not enough money. You have {AmountOfMoney} BYN");
+                return -1;
+            }
+            else
+                return AmountOfMoney = await Task.Run(()=>
+                      ExcelMethodGroup.WithdrawMoneyXLSXAsync(this, AmountOfMoney, desiredAmount));
+        }
+
         public double TakeMoney(double desiredAmount = 0)
         {
             //money check

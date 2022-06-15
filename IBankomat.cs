@@ -1,6 +1,6 @@
 ﻿namespace BankSystem
 {
-    internal interface IBankomat
+    public interface IBankomat
     {
         string Adress { get; set; }
         double AmountOfMoneyATM { get; set; }
@@ -9,6 +9,6 @@
         public Bankomat CreateATM(List<IBankomat> bankomats);
         void Info();
         void LoadMoney();
-        void WithdrawMoney(IAccount account);
+        public void WithdrawMoney(IAccount account);
     }
 }

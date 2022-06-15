@@ -38,4 +38,32 @@
         SignIn,
         Back = 0
     }
+    /// <summary>
+    /// Enum properties class ATM
+    /// </summary>
+    public enum EnumATM
+    {
+        Number = 1,
+        Adress = 2,
+        MoneyATM = 3,
+    }
+    /// <summary>
+    /// Enum properties class Acc (info about client)
+    /// </summary>
+    public enum EnumClient
+    {
+        ID = 1,
+        Name = 2,        
+        Surname = 3,        
+        Age = 4,
+        Money = 5,        
+    }
+    /// <summary>
+    /// Enum properties class Acc (for login)
+    /// </summary>
+    public enum EnumAcc
+    {
+        Login = 2,
+        Password = 3,
+    }
 }

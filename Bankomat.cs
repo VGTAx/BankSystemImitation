@@ -1,9 +1,13 @@
 ﻿using InitHelperInformatMessage;
 using OfficeOpenXml;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Runtime.Remoting;
+using System.Diagnostics;
 
 namespace BankSystem
 {
-    internal class Bankomat : IBankomat
+    public sealed class Bankomat : IBankomat
     {
         public Bankomat() { }
         public Bankomat(string adress, double sum, int numberATM)
@@ -39,7 +43,8 @@ namespace BankSystem
                 }
             }
             worksheetATM.Cells[rowNumber, 3].Value = AmountOfMoneyATM;
-            packageATM.SaveAs("ATMInfo.xlsx", ExcelMethodGroup.SetPassword("PasswordATM.xlsx", "password"));
+            packageATM.SaveAs("ATMInfo.xlsx", 
+                ExcelMethodGroup.SetPassword("PasswordATM.xlsx", "password"));
 
         }
         /// <summary>
@@ -52,7 +57,7 @@ namespace BankSystem
             Adress = InitializationHelper.StringInIt("adress ATM");
             AmountOfMoneyATM = InitializationHelper.DoubleInit("amount of money");           
             NumberATM = new Random().Next(1, 999);            
-            ExcelMethodGroup.WorksheetAtmXLSX(new Bankomat(Adress, AmountOfMoneyATM, NumberATM));
+            ExcelMethodGroup.WorksheetAtmXLSXAsync(new Bankomat(Adress, AmountOfMoneyATM, NumberATM));
             MessageInformant.SuccessOutput("ATM Added!");
             Console.ReadLine();
             return new Bankomat(Adress, AmountOfMoneyATM, NumberATM);
@@ -98,12 +103,14 @@ namespace BankSystem
         /// Withdraw money from ATM
         /// </summary>
         /// <param name="account"></param>
-        public void WithdrawMoney(IAccount account)
+        public async void WithdrawMoney(IAccount account)
         {
+            
             double tempDesAmount = 0;
             bool check = true;
 
-            tempDesAmount = InitializationHelper.DoubleInit("amount of money to withdraw");
+            //tempDesAmount = InitializationHelper.DoubleInit("amount of money to withdraw");
+            tempDesAmount = 1200;
             while (tempDesAmount == 0)
             {
                 MessageInformant.ErrorOutput($"Can't withdraw 0 BYN");
@@ -144,9 +151,9 @@ namespace BankSystem
                 }
             }
             if (check)
-            {
-                AmountOfMoneyATM = ExcelMethodGroup.WithdrawMoneyAtmXLSX(this, AmountOfMoneyATM, tempDesAmount);                
-                account.TakeMoney(tempDesAmount);  
+            {               
+                AmountOfMoneyATM = await ExcelMethodGroup.WithdrawMoneyAtmXLSXAsync(this, AmountOfMoneyATM, tempDesAmount);
+                account.TakeMoneyAsync(tempDesAmount);  
             }
         }
     }

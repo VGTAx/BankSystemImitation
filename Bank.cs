@@ -1,8 +1,9 @@
 ﻿using InitHelperInformatMessage;
+using System.Diagnostics;
 
 namespace BankSystem
 {
-    internal sealed class Bank : IBank
+    public sealed class Bank : IBank
     {
         private delegate void Manage();
 
@@ -119,11 +120,11 @@ namespace BankSystem
                         switch (enter)
                         {
                             case "1":
-                                accAUTH.TakeMoney();
+                                accAUTH.TakeMoneyAsync();
                                 MessageInformant.SuccessOutput($"Money withdrawn!");
                                 Console.ReadLine();
                                 break;
-                            case "2":
+                            case "2":                                
                                 while (true)
                                 {   //checking if the bank has ATM
                                     Bankomats = ExcelMethodGroup.LoadListAtmXLSX();
@@ -143,15 +144,15 @@ namespace BankSystem
                                         }
                                         //select ATM
                                         Console.Write("\nSelect ATM to withdraw money (");
-                                        int tempATM = (int)InitializationHelper.DoubleInit("№ATM)");
+                                        //int tempATM = (int)InitializationHelper.DoubleInit("№ATM)");
                                         //request to find an ATM
-                                        var atmSelect = from p in Bankomats where p.NumberATM == tempATM select p;
+                                        var atmSelect = from p in Bankomats where p.NumberATM == 43 select p;
 
                                         foreach (var authATM in atmSelect)
                                         {
                                             authATM.WithdrawMoney(accAUTH);
                                             MessageInformant.SuccessOutput($"Money withdrawn!");
-                                            Console.ReadLine();
+                                            //Console.ReadLine();
                                         }
                                         if (atmSelect.Any())
                                         {
@@ -175,7 +176,8 @@ namespace BankSystem
                     MessageInformant.ErrorOutput($"You have {accAUTH.AmountOfMoney} BYN. Top up your account!");
                     Console.ReadLine();
                 }
-            }
+            }            
+            Thread.Sleep(5000);
         }
         /// <summary>
         /// Get information about the client
