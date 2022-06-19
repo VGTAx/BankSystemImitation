@@ -109,8 +109,7 @@ namespace BankSystem
             double tempDesAmount = 0;
             bool check = true;
 
-            //tempDesAmount = InitializationHelper.DoubleInit("amount of money to withdraw");
-            tempDesAmount = 1200;
+            tempDesAmount = InitializationHelper.DoubleInit("amount of money to withdraw");            
             while (tempDesAmount == 0)
             {
                 MessageInformant.ErrorOutput($"Can't withdraw 0 BYN");

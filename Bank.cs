@@ -7,10 +7,10 @@ namespace BankSystem
     {
         private delegate void Manage();
 
-        private Dictionary<int, Manage> DictManageBank;
-        private Dictionary<int, Manage> DictManageClient;
-        private Dictionary<int, Manage> DictManageMain;
-        private Dictionary<int, Manage> DictManageAccountClient;        
+        private Dictionary<EnumManageBank, Manage> DictManageBank;
+        private Dictionary<EnumManageClient, Manage> DictManageClient;
+        private Dictionary<EnumManageMain, Manage> DictManageMain;
+        private Dictionary<EnumManageAccountClient, Manage> DictManageAccountClient;        
 
         public Bank()
         {
@@ -67,7 +67,8 @@ namespace BankSystem
                 {
                     check = true;
                     db.Authorization = true;
-                    MessageInformant.SuccessOutput("Login succeeded");
+                    MessageInformant.SuccessOutput("Login succeeded!");
+                    Console.ReadLine();
                     ManageAccountClient();
                     db.Authorization = false;
                 }
@@ -90,7 +91,6 @@ namespace BankSystem
         /// </summary>
         private void AddMoney()
         {
-
             var client = from p in Accounts where p.Authorization == true select p;
 
             foreach (var item in client)
@@ -144,15 +144,15 @@ namespace BankSystem
                                         }
                                         //select ATM
                                         Console.Write("\nSelect ATM to withdraw money (");
-                                        //int tempATM = (int)InitializationHelper.DoubleInit("№ATM)");
+                                        int tempATM = (int)InitializationHelper.DoubleInit("№ATM)");
                                         //request to find an ATM
-                                        var atmSelect = from p in Bankomats where p.NumberATM == 43 select p;
+                                        var atmSelect = from p in Bankomats where p.NumberATM == tempATM select p;
 
                                         foreach (var authATM in atmSelect)
                                         {
                                             authATM.WithdrawMoney(accAUTH);
                                             MessageInformant.SuccessOutput($"Money withdrawn!");
-                                            //Console.ReadLine();
+                                            Console.ReadLine();
                                         }
                                         if (atmSelect.Any())
                                         {
@@ -176,8 +176,7 @@ namespace BankSystem
                     MessageInformant.ErrorOutput($"You have {accAUTH.AmountOfMoney} BYN. Top up your account!");
                     Console.ReadLine();
                 }
-            }            
-            
+            } 
         }
         /// <summary>
         /// Get information about the client
@@ -193,7 +192,6 @@ namespace BankSystem
                 item.Info();
             }
         }
-
         /// <summary>
         /// Add ATM of Bank
         /// </summary>
@@ -276,16 +274,13 @@ namespace BankSystem
         {
             Console.Clear();
             //create a dictionary to store methods
-            DictManageAccountClient = new Dictionary<int, Manage>
+            DictManageAccountClient = new Dictionary<EnumManageAccountClient, Manage>
             {
-                {1, new Manage(AddMoney) },
-                {2, new Manage(TakeMoney) },
-                {3, new Manage(GetInfoClient) }
-            };
-            //created array that enum available method
-            EnumManageAccountClient enumManageAccountClient = new EnumManageAccountClient();
-            Array EnumManageAccountClient = Enum.GetValues(enumManageAccountClient.GetType());
-
+                {EnumManageAccountClient.AddMoney, new Manage(AddMoney) },
+                {EnumManageAccountClient.TakeMoney, new Manage(TakeMoney) },
+                {EnumManageAccountClient.GetInfo, new Manage(GetInfoClient) }
+            };            
+           
             while (true)
             {
                 Console.Clear();
@@ -295,31 +290,29 @@ namespace BankSystem
                 Console.ResetColor();
                 Console.WriteLine("Select function(Enter number):\n");
                 //enum available method
-                foreach (int item in EnumManageAccountClient)
+                foreach (var item in Enum.GetValues(typeof(EnumManageAccountClient)))
                 {
-                    Console.WriteLine($"{item}.{EnumManageAccountClient.GetValue(item)}");
+                    Console.WriteLine($"{(int)item}.{(EnumManageAccountClient)item}");
                 }
 
-                bool result = int.TryParse(Console.ReadLine(), out int select);
+                bool result = Enum.TryParse(Console.ReadLine(), out EnumManageAccountClient select);
 
-                if (result && select == 0)
+                try
                 {
-                    Console.Clear();
-                    break;
-                }
-                //passing selected method to delegate
-                if (result && EnumManageAccountClient.Length > select)
-                {
+                    if (result && select == 0)
+                    {
+                        Console.Clear();
+                        break;
+                    };
                     DictManageAccountClient[select]();
                 }
-                else
+                catch (Exception)
                 {
                     MessageInformant.ErrorOutput("Invalid select");
-                    Thread.Sleep(400);
+                    Console.ReadLine();
                 }
             }
         }
-
         /// <summary>
         /// Manage Bank
         /// </summary>
@@ -327,17 +320,14 @@ namespace BankSystem
         {
             Console.Clear();
             //create a dictionary to store methods
-            DictManageBank = new Dictionary<int, Manage>
+            DictManageBank = new Dictionary<EnumManageBank, Manage>
             {
-                {1, new Manage(AddATM) },
-                {2, new Manage(GetAllATM) },
-                {3, new Manage(LoadMoneyATM) }
+                {EnumManageBank.AddATM, new Manage(AddATM) },
+                {EnumManageBank.GetAllATM, new Manage(GetAllATM) },
+                {EnumManageBank.LoadMoneyATM, new Manage(LoadMoneyATM) }
             };
             Console.Clear();
-            //created array that enum available method
-            EnumManageBank manageBank = new EnumManageBank();
-            Array EnumManageBank = Enum.GetValues(manageBank.GetType());
-
+            
             while (true)
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -346,23 +336,22 @@ namespace BankSystem
                 Console.ResetColor();
                 Console.WriteLine("Select function(Enter number):\n");
                 //enum available method
-                foreach (int item in EnumManageBank)
+                foreach (int item in Enum.GetValues(typeof(EnumManageBank)))
                 {
-                    Console.WriteLine($"{item}.{EnumManageBank.GetValue(item)}");
+                    Console.WriteLine($"{(int)item}.{(EnumManageBank)item}");
                 }
-                bool result = int.TryParse(Console.ReadLine(), out int select);
+                bool result = Enum.TryParse(Console.ReadLine(), out EnumManageBank select);
 
-                if (result && select == 0)
+                try
                 {
-                    Console.Clear();
-                    break;
-                }
-                //passing selected method to delegate
-                if (result && EnumManageBank.Length > select)
-                {
+                    if (result && select == 0)
+                    {
+                        Console.Clear();
+                        break;
+                    }
                     DictManageBank[select]();
                 }
-                else
+                catch (Exception)
                 {
                     MessageInformant.ErrorOutput("Invalid select");
                     Thread.Sleep(400);
@@ -376,43 +365,39 @@ namespace BankSystem
         {
             Console.Clear();
             //create a dictionary to store methods
-            DictManageClient = new Dictionary<int, Manage>
+            DictManageClient = new Dictionary<EnumManageClient, Manage>
             {
-                {1, new Manage(SighUp) },
-                {2, new Manage(SignIn) },
-            };
-            //created array that enum available method
-            EnumManageClient manageClient = new EnumManageClient();
-            Array EnumManageClient = Enum.GetValues(manageClient.GetType());
-
+                {EnumManageClient.SighUp, new Manage(SighUp) },
+                {EnumManageClient.SignIn, new Manage(SignIn) },
+            };   
 
             while (true)
             {
+                Console.Clear();
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("1. Регистрация\n2. Вход в личный кабинет ");
                 Console.ResetColor();
                 Console.WriteLine("Select function(Enter number):\n");
                 //enum available method
-                foreach (int item in EnumManageClient)
+                foreach (var item in Enum.GetValues(typeof(EnumManageClient)))
                 {
-                    Console.WriteLine($"{item}.{EnumManageClient.GetValue(item)}");
+                    Console.WriteLine($"{(int)item}.{(EnumManageClient)item}");
                 }
-                bool result = int.TryParse(Console.ReadLine(), out int select);
+                bool result = Enum.TryParse(Console.ReadLine(), out EnumManageClient select);
 
-                if (result && select == 0)
+                try
                 {
-                    Console.Clear();
-                    break;
-                }
-                //passing selected method to delegate
-                if (result && EnumManageClient.Length > select)
-                {
+                    if (result && select == 0)
+                    {
+                        Console.Clear();
+                        break;
+                    }
                     DictManageClient[select]();
                 }
-                else
+                catch (Exception)
                 {
                     MessageInformant.ErrorOutput("Invalid select");
-                    Thread.Sleep(400);
+                    Console.ReadLine();
                 }
             }
         }
@@ -423,14 +408,11 @@ namespace BankSystem
         {
             Console.Clear();
             //create a dictionary to store methods
-            DictManageMain = new Dictionary<int, Manage>
+            DictManageMain = new Dictionary<EnumManageMain, Manage>
             {
-                {1,new Manage(ManageClient)},
-                {2,new Manage(ManageBank)}
-            };
-            //created array that enum available method
-            EnumManageMain manageMain = new EnumManageMain();
-            Array EnumManageMain = Enum.GetValues(manageMain.GetType());
+                {EnumManageMain.Client,new Manage(ManageClient)},
+                {EnumManageMain.Bank,new Manage(ManageBank)}
+            };            
 
             while (true)
             {
@@ -441,31 +423,32 @@ namespace BankSystem
                 Console.ResetColor();
                 Console.WriteLine("Select user(Enter number):\n");
                 //enum available method
-                foreach (int item in EnumManageMain)
+                foreach (var item in Enum.GetValues(typeof(EnumManageMain)))
                 {
-                    Console.WriteLine($"{item}.{EnumManageMain.GetValue(item)}");
+                    Console.WriteLine($"{(int)item}.{(EnumManageMain)item}");
                 }
-                bool result = int.TryParse(Console.ReadLine(), out int select);
-
-                if (result && select == 0)
-                {
-                    Console.Clear();
-                    string temp = InitializationHelper.StringInIt("\"Y\" or \"y\" to exit or " +
-                        "press any button to continue");
-                    if (temp == "Y")
-                        break;
-                    continue;
-                }
+                bool result = Enum.TryParse(Console.ReadLine(), out EnumManageMain select);
+                
                 //passing selected method to delegate
-                if (result && EnumManageMain.Length > select)
+                try
                 {
+                    if (result && select == 0)
+                    {
+                        Console.Clear();
+                        string temp = InitializationHelper.StringInIt("\"Y\" or \"y\" to exit or " +
+                            "press any button to continue");
+                        if (temp == "Y")
+                            break;
+                        continue;
+                    }
                     DictManageMain[select]();
                 }
-                else
+                catch 
                 {
                     MessageInformant.ErrorOutput("Invalid select");
                     Console.ReadLine();
                 }
+                
             }
         }
     }
