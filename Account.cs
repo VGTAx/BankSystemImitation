@@ -76,17 +76,22 @@ namespace BankSystem
 
                 Random rand = new Random();
                 ID = rand.Next(1, 10000);
+                //while (XmlMethodGroup.CheckInfoXml()==false)
+                //{
+                //    ID = rand.Next(1, 10000);
+                //}
 
                 person = new Person(agePerson, namePerson, surnamePerson);
                 while (!Person.CheckAge(person))
                 {
                     agePerson = InitializationHelper.IntInit("age");
-                    person = new Person(agePerson, namePerson, surnamePerson);
+                    person = new Person(agePerson, namePerson, surnamePerson); ///!!!РЕФАКТОРИНг
                 }
             }
             while (CheckLength(new Account(person, Password, Login, 0, ID)) == false);
 
-            ExcelMethodGroup.WorksheetAccountXLSXAsync(new Account(person, Password, Login, 0, ID));
+            //ExcelMethodGroup.WorksheetAccountXLSXAsync(new Account(person, Password, Login, 0, ID));
+            XmlMethodGroup.OpenOrCreateXmlAccountFile(new Account(person, Password, Login, 0, ID));
             MessageInformant.SuccessOutput("Account registered!");
             Console.ReadLine();
             Console.Clear();
