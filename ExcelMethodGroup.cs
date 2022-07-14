@@ -46,7 +46,7 @@ namespace BankSystem
         }
 
         /// <summary>
-        /// Сhecking for repetitions Account name (Login)
+        /// Сhecking for availability Account name (Login)
         /// </summary>
         /// <param name="login">Checked value</param>
         /// <returns></returns>
@@ -371,12 +371,12 @@ namespace BankSystem
         /// <summary>
         /// (Async)ATM withdrawal method. Change sum in excel file
         /// </summary>
-        /// <param name="bankomat">Bankomat where the money is withdrawn from</param>
+        /// <param name="atm">ATM where the money is withdrawn from</param>
         /// <param name="amountMoney">Available sum on an ATM</param>
         /// <param name="tempAmountMoney">Desire sum to withdraw</param>
         /// <returns></returns>
         public static async Task<double> WithdrawMoneyAtmXLSXAsync
-            (IBankomat bankomat, double amountMoney, double tempAmountMoney)
+            (IATM atm, double amountMoney, double tempAmountMoney)
         {
             int tempRow = 0;
             byte[] bin = File.ReadAllBytes("ATMInfo.xlsx");
@@ -389,7 +389,7 @@ namespace BankSystem
                 for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.Start.Column; j++)
                 {
                     int tempNumberATM = int.Parse(worksheet.Cells[i, j].Value.ToString());
-                    if (bankomat.NumberATM == tempNumberATM)
+                    if (atm.NumberATM == tempNumberATM)
                     {
                         tempRow = i;
                     }
@@ -403,11 +403,11 @@ namespace BankSystem
         /// <summary>
         /// ATM withdrawal method. Change sum in excel file
         /// </summary>
-        /// <param name="bankomat">Bankomat where the money is withdrawn from</param>
+        /// <param name="atm">ATM where the money is withdrawn from</param>
         /// <param name="amountMoney">Available sum on an ATM</param>
         /// <param name="tempAmountMoney">Desire sum to withdraw</param>
         /// <returns></returns>
-        public static double WithdrawMoneyAtmXLSX(IBankomat bankomat, double amountMoney, double tempAmountMoney)
+        public static double WithdrawMoneyAtmXLSX(IATM atm, double amountMoney, double tempAmountMoney)
         {
             int tempRow = 0;
             byte[] bin = File.ReadAllBytes("ATMInfo.xlsx");
@@ -420,7 +420,7 @@ namespace BankSystem
                 for (int j = worksheet.Dimension.Start.Column; j <= worksheet.Dimension.Start.Column; j++)
                 {
                     int tempNumberATM = int.Parse(worksheet.Cells[i, j].Value.ToString());
-                    if (bankomat.NumberATM == tempNumberATM)
+                    if (atm.NumberATM == tempNumberATM)
                     {
                         tempRow = i;
                     }
@@ -435,8 +435,8 @@ namespace BankSystem
         /// <summary>
         /// Create or open workbook with ATM info
         /// </summary>
-        /// <param name="bankomat"></param>
-        public static void WorksheetAtmXLSX(IBankomat bankomat)
+        /// <param name="atm"></param>
+        public static void WorksheetAtmXLSX(IATM atm)
         {
             ExcelPackage packageATM = new ExcelPackage();
             packageATM.Workbook.Properties.Author = "VGTAx";
@@ -499,9 +499,9 @@ namespace BankSystem
             if (rowWS > 2)
             {
 
-                while (CheckInfoXLSX(bankomat.NumberATM, "ATMInfo.xlsx", "ATM Info", "PasswordATM.xlsx", "password") == false)
+                while (CheckInfoXLSX(atm.NumberATM, "ATMInfo.xlsx", "ATM Info", "PasswordATM.xlsx", "password") == false)
                 {
-                    bankomat.NumberATM = new Random().Next(1, 9999);
+                    atm.NumberATM = new Random().Next(1, 9999);
                 }
             }
             //table(font and border) settings
@@ -525,9 +525,9 @@ namespace BankSystem
             worksheetATM.Cells[2, (int)EnumATM.MoneyATM, rowWS, (int)EnumATM.MoneyATM].Style.Font.Bold = true;
             worksheetATM.Cells[2, (int)EnumATM.MoneyATM, rowWS, (int)EnumATM.MoneyATM].Style.Font.Color.SetColor(Color.Red);
 
-            worksheetATM.Cells[rowWS, (int)EnumATM.Number].Value = bankomat.NumberATM;
-            worksheetATM.Cells[rowWS, (int)EnumATM.Adress].Value = bankomat.Adress;
-            worksheetATM.Cells[rowWS, (int)EnumATM.MoneyATM].Value = bankomat.AmountOfMoneyATM;
+            worksheetATM.Cells[rowWS, (int)EnumATM.Number].Value = atm.NumberATM;
+            worksheetATM.Cells[rowWS, (int)EnumATM.Adress].Value = atm.Adress;
+            worksheetATM.Cells[rowWS, (int)EnumATM.MoneyATM].Value = atm.AmountOfMoneyATM;
 
             packageATM.SaveAs("ATMInfo.xlsx", SetPassword("PasswordATM.xlsx", "password"));
 
@@ -535,8 +535,8 @@ namespace BankSystem
         /// <summary>
         /// (Async)Create or open workbook with ATM info
         /// </summary>
-        /// <param name="bankomat"></param>
-        public static async Task WorksheetAtmXLSXAsync(IBankomat bankomat)
+        /// <param name="atm"></param>
+        public static async Task WorksheetAtmXLSXAsync(IATM atm)
         {
             ExcelPackage packageATM = new ExcelPackage();
             packageATM.Workbook.Properties.Author = "VGTAx";
@@ -599,9 +599,9 @@ namespace BankSystem
             if (rowWS > 2)
             {
 
-                while (CheckInfoXLSX(bankomat.NumberATM, "ATMInfo.xlsx", "ATM Info", "PasswordATM.xlsx", "password") == false)
+                while (CheckInfoXLSX(atm.NumberATM, "ATMInfo.xlsx", "ATM Info", "PasswordATM.xlsx", "password") == false)
                 {
-                    bankomat.NumberATM = new Random().Next(1, 9999);
+                    atm.NumberATM = new Random().Next(1, 9999);
                 }
             }
             //table(font and border) settings
@@ -625,9 +625,9 @@ namespace BankSystem
             worksheetATM.Cells[2, (int)EnumATM.MoneyATM, rowWS, (int)EnumATM.MoneyATM].Style.Font.Bold = true;
             worksheetATM.Cells[2, (int)EnumATM.MoneyATM, rowWS, (int)EnumATM.MoneyATM].Style.Font.Color.SetColor(Color.Red);
 
-            worksheetATM.Cells[rowWS, (int)EnumATM.Number].Value = bankomat.NumberATM;
-            worksheetATM.Cells[rowWS, (int)EnumATM.Adress].Value = bankomat.Adress;
-            worksheetATM.Cells[rowWS, (int)EnumATM.MoneyATM].Value = bankomat.AmountOfMoneyATM;
+            worksheetATM.Cells[rowWS, (int)EnumATM.Number].Value = atm.NumberATM;
+            worksheetATM.Cells[rowWS, (int)EnumATM.Adress].Value = atm.Adress;
+            worksheetATM.Cells[rowWS, (int)EnumATM.MoneyATM].Value = atm.AmountOfMoneyATM;
 
             await Task.Run(() => packageATM.SaveAs("ATMInfo.xlsx", SetPassword("PasswordATM.xlsx", "password")));
         }
@@ -670,9 +670,9 @@ namespace BankSystem
             }
         }
         //Load list ATM from Excel file
-        public static List<IBankomat> LoadListAtmXLSX()
+        public static List<IATM> LoadListAtmXLSX()
         {
-            List<IBankomat> listATM = new List<IBankomat>();
+            List<IATM> listATM = new List<IATM>();
             try
             {
                 byte[] bin = File.ReadAllBytes("ATMInfo.xlsx");
@@ -682,14 +682,14 @@ namespace BankSystem
 
                 for (int i = worksheet.Dimension.Start.Row + 1; i <= worksheet.Dimension.End.Row; i++)
                 {
-                    Bankomat bankomat = new Bankomat();
+                    ATM atm = new ATM();
 
-                    bankomat.NumberATM = int.Parse(worksheet.Cells[i, (int)EnumATM.Number].Value.ToString());
-                    bankomat.Adress = worksheet.Cells[i, (int)EnumATM.Adress].Value.ToString();
-                    bankomat.AmountOfMoneyATM = int.Parse(worksheet.Cells[i, (int)EnumATM.MoneyATM].Value.ToString());
+                    atm.NumberATM = int.Parse(worksheet.Cells[i, (int)EnumATM.Number].Value.ToString());
+                    atm.Adress = worksheet.Cells[i, (int)EnumATM.Adress].Value.ToString();
+                    atm.AmountOfMoneyATM = int.Parse(worksheet.Cells[i, (int)EnumATM.MoneyATM].Value.ToString());
 
                     //add object to list
-                    listATM.Add(bankomat);
+                    listATM.Add(atm);
                 }
                 ///retur list ATM
                 return listATM;

@@ -1,16 +1,13 @@
 ﻿using InitHelperInformatMessage;
 using OfficeOpenXml;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Runtime.Remoting;
-using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace BankSystem
 {
-    public sealed class Bankomat : IBankomat
+    public sealed class ATM : IATM
     {
-        public Bankomat() { }
-        public Bankomat(string adress, double sum, int numberATM)
+        public ATM() { }
+        public ATM(string adress, double sum, int numberATM)
         {
             Adress = adress;
             AmountOfMoneyATM = sum;
@@ -31,7 +28,7 @@ namespace BankSystem
             ExcelWorksheet worksheetATM = packageATM.Workbook.Worksheets["ATM Info"];
 
             int rowNumber = 0;
-            for (int i = worksheetATM.Dimension.Start.Row+1; i <= worksheetATM.Dimension.End.Row; i++)
+            for (int i = worksheetATM.Dimension.Start.Row + 1; i <= worksheetATM.Dimension.End.Row; i++)
             {
                 for (int j = worksheetATM.Dimension.Start.Column; j <= worksheetATM.Dimension.Start.Column; j++)
                 {
@@ -39,28 +36,55 @@ namespace BankSystem
                     if (tempNumberATM == NumberATM)
                     {
                         rowNumber = i;
-                    }                    
+                    }
                 }
             }
             worksheetATM.Cells[rowNumber, 3].Value = AmountOfMoneyATM;
-            packageATM.SaveAs("ATMInfo.xlsx", 
+            packageATM.SaveAs("ATMInfo.xlsx",
                 ExcelMethodGroup.SetPassword("PasswordATM.xlsx", "password"));
 
         }
         /// <summary>
+        /// Load money into ATM. Value save in Xml File
+        /// </summary>
+        public void LoadMoneyXml()
+        {
+            AmountOfMoneyATM += InitializationHelper.DoubleInit("the amount of money to load into the ATM");
+            XDocument xAtmDocument = XDocument.Load(XmlMethodGroup.ATM_INFO_DOCUMENT);
+            XElement xAtmRootElement = xAtmDocument.Element(XmlMethodGroup.ATM_INFO_ELEM);
+
+            foreach (var atm in xAtmRootElement.Elements())
+            {
+                if (int.Parse(atm.Attribute(XmlMethodGroup.NUMBER_ATM).Value) == NumberATM)
+                {
+                    atm.Element(XmlMethodGroup.AMOUNT_OF_MONEY).Value = AmountOfMoneyATM.ToString();
+                    xAtmDocument.Save(XmlMethodGroup.ACCOUNTS_INFO_DOCUMENT);
+                    break;
+                }
+            }
+        }
+        /// <summary>
         /// Create ATM
         /// </summary>
-        /// <param name="bankomats"></param>
+        /// <param name="atm"></param>
         /// <returns></returns>
-        public Bankomat CreateATM(List<IBankomat> bankomats)
+        public ATM CreateATM(List<IATM> atm)
         {
             Adress = InitializationHelper.StringInIt("adress ATM");
-            AmountOfMoneyATM = InitializationHelper.DoubleInit("amount of money");           
-            NumberATM = new Random().Next(1, 999);            
-            ExcelMethodGroup.WorksheetAtmXLSXAsync(new Bankomat(Adress, AmountOfMoneyATM, NumberATM));
+            AmountOfMoneyATM = InitializationHelper.DoubleInit("amount of money");
+            NumberATM = new Random().Next(1, 999);
+            while (!XmlMethodGroup.CheckValueAvailableXml(NumberATM, XmlMethodGroup.ATM_INFO_DOCUMENT,
+              XmlMethodGroup.ATM_INFO_ELEM, XmlMethodGroup.NUMBER_ATM))
+            {
+                NumberATM = new Random().Next(1, 999);
+            }
+
+            // ExcelMethodGroup.WorksheetAtmXLSXAsync(new Bankomat(Adress, AmountOfMoneyATM, NumberATM));
+            XmlMethodGroup.OpenOrCreateXmlAtmFile(new ATM(Adress, AmountOfMoneyATM, NumberATM));
+
             MessageInformant.SuccessOutput("ATM Added!");
             Console.ReadLine();
-            return new Bankomat(Adress, AmountOfMoneyATM, NumberATM);
+            return new ATM(Adress, AmountOfMoneyATM, NumberATM);
         }
         /// <summary>
         /// Get information about ATM
@@ -105,11 +129,11 @@ namespace BankSystem
         /// <param name="account"></param>
         public async void WithdrawMoney(IAccount account)
         {
-            
+
             double tempDesAmount = 0;
             bool check = true;
 
-            tempDesAmount = InitializationHelper.DoubleInit("amount of money to withdraw");            
+            tempDesAmount = InitializationHelper.DoubleInit("amount of money to withdraw");
             while (tempDesAmount == 0)
             {
                 MessageInformant.ErrorOutput($"Can't withdraw 0 BYN");
@@ -150,9 +174,10 @@ namespace BankSystem
                 }
             }
             if (check)
-            {               
-                AmountOfMoneyATM = await ExcelMethodGroup.WithdrawMoneyAtmXLSXAsync(this, AmountOfMoneyATM, tempDesAmount);
-                account.TakeMoneyAsync(tempDesAmount);  
+            {
+                //AmountOfMoneyATM = await ExcelMethodGroup.WithdrawMoneyAtmXLSXAsync(this, AmountOfMoneyATM, tempDesAmount);
+                AmountOfMoneyATM = XmlMethodGroup.WithdrawMoneyAtmXml(this, AmountOfMoneyATM, tempDesAmount);
+                account.TakeMoneyXml(tempDesAmount);
             }
         }
     }

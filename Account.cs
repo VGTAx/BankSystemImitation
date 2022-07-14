@@ -1,6 +1,7 @@
 ﻿using Attributes;
 using InitHelperInformatMessage;
 using OfficeOpenXml;
+using System.Xml.Linq;
 
 namespace BankSystem
 {
@@ -8,7 +9,7 @@ namespace BankSystem
     /// сlass Account used to create a bank customer
     /// </summary>
 
-    [CheckLengthLoginPassword(20)]
+    [CheckLengthLoginPassword(15)]
     public class Account : IAccount
     {
         public Account()
@@ -58,7 +59,7 @@ namespace BankSystem
             do
             {
                 Login = InitializationHelper.StringInIt("login account");
-                while (!ExcelMethodGroup.CheckAccNameAvailableXLSX(Login))
+                while (!XmlMethodGroup.CheckAccNameAvailableXml(Login))
                 {
                     Login = InitializationHelper.StringInIt("login account");
                 }
@@ -76,21 +77,25 @@ namespace BankSystem
 
                 Random rand = new Random();
                 ID = rand.Next(1, 10000);
-                //while (XmlMethodGroup.CheckInfoXml()==false)
-                //{
-                //    ID = rand.Next(1, 10000);
-                //}
+                ///check if ID is available
+                while (!XmlMethodGroup.CheckValueAvailableXml(ID, XmlMethodGroup.ACCOUNTS_INFO_DOCUMENT,
+                                                    XmlMethodGroup.ACCOUNTS_INFO_ELEM, XmlMethodGroup.ID))
+                {
+                    ID = rand.Next(1, 10000);
+                }
 
                 person = new Person(agePerson, namePerson, surnamePerson);
                 while (!Person.CheckAge(person))
                 {
                     agePerson = InitializationHelper.IntInit("age");
-                    person = new Person(agePerson, namePerson, surnamePerson); ///!!!РЕФАКТОРИНг
+                    person.Age = agePerson;
                 }
             }
-            while (CheckLength(new Account(person, Password, Login, 0, ID)) == false);
-
+            while (CheckLengthLoginAndPassword(new Account(person, Password, Login, 0, ID)) == false);
+            ///Excel file like a database
             //ExcelMethodGroup.WorksheetAccountXLSXAsync(new Account(person, Password, Login, 0, ID));
+
+            //Xml file like a databse
             XmlMethodGroup.OpenOrCreateXmlAccountFile(new Account(person, Password, Login, 0, ID));
             MessageInformant.SuccessOutput("Account registered!");
             Console.ReadLine();
@@ -135,8 +140,39 @@ namespace BankSystem
                 else
                 {
                     ClientInfoWS.Cells[rowClient, 5].Value = AmountOfMoney += amount;
-                    excelPackage.SaveAs("ClientInfo.xlsx", 
+                    excelPackage.SaveAs("ClientInfo.xlsx",
                         ExcelMethodGroup.SetPassword("PasswordClient.xlsx", "password"));
+                    return AmountOfMoney;
+                }
+            }
+            return AmountOfMoney;
+        }
+
+        /// <summary>
+        /// Deposit money into an account (database is XmlFile)
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        public double AddMoneyXml(double amount = 0)
+        {
+            XDocument xAccountDocument = XDocument.Load(XmlMethodGroup.ACCOUNTS_INFO_DOCUMENT);
+            XElement xAccountElement = xAccountDocument.Element(XmlMethodGroup.ACCOUNTS_INFO_ELEM);
+
+            foreach (var person in xAccountElement.Elements())
+            {
+                if (int.Parse(person.Attribute(XmlMethodGroup.ID).Value) == ID &&
+                    amount == 0)
+                {
+                    person.Element(XmlMethodGroup.AMOUNT_OF_MONEY).Value =
+                        (AmountOfMoney += InitializationHelper.DoubleInit("sum of money to add")).ToString();
+                    xAccountDocument.Save(XmlMethodGroup.ACCOUNTS_INFO_DOCUMENT);
+                    return AmountOfMoney;
+                }
+                else if (int.Parse(person.Attribute(XmlMethodGroup.ID).Value) == ID)
+                {
+                    person.Element(XmlMethodGroup.AMOUNT_OF_MONEY).Value =
+                       (AmountOfMoney += amount).ToString();
+                    xAccountDocument.Save(XmlMethodGroup.ACCOUNTS_INFO_DOCUMENT);
                     return AmountOfMoney;
                 }
             }
@@ -148,7 +184,7 @@ namespace BankSystem
         /// </summary>
         /// <param name="desiredAmount"></param>
         /// <returns></returns>
-        public async Task <double> TakeMoneyAsync(double desiredAmount = 0)
+        public async Task<double> TakeMoneyAsync(double desiredAmount = 0)
         {
             //money check
             if (desiredAmount == 0)
@@ -168,8 +204,10 @@ namespace BankSystem
                         tempDesAmount = InitializationHelper.DoubleInit("sum of money to withdraw");
                     }
                 }
-                return AmountOfMoney = await Task.Run(()=>
-                                        ExcelMethodGroup.WithdrawMoneyXLSXAsync(this, AmountOfMoney, tempDesAmount));
+                // return AmountOfMoney = await Task.Run(()=>
+                //                         ExcelMethodGroup.WithdrawMoneyXLSXAsync(this, AmountOfMoney, tempDesAmount));
+
+                return AmountOfMoney = XmlMethodGroup.WithdrawMoneyXml(this, AmountOfMoney, tempDesAmount);
             }
             //money check
             if (desiredAmount > AmountOfMoney)
@@ -178,11 +216,15 @@ namespace BankSystem
                 return -1;
             }
             else
-                return AmountOfMoney = await Task.Run(()=>
+                return AmountOfMoney = await Task.Run(() =>
                       ExcelMethodGroup.WithdrawMoneyXLSXAsync(this, AmountOfMoney, desiredAmount));
         }
-
-        public double TakeMoney(double desiredAmount = 0)
+        /// <summary>
+        /// Withdraw money from the account. Value is stored in xml file 
+        /// </summary>
+        /// <param name="desiredAmount">Desired amount of money to withdraw money</param>
+        /// <returns></returns>
+        public double TakeMoneyXml(double desiredAmount = 0)
         {
             //money check
             if (desiredAmount == 0)
@@ -202,7 +244,9 @@ namespace BankSystem
                         tempDesAmount = InitializationHelper.DoubleInit("sum of money to withdraw");
                     }
                 }
-                return AmountOfMoney = ExcelMethodGroup.WithdrawMoneyXLSX(this, AmountOfMoney, tempDesAmount);
+                //Excel method
+                //return AmountOfMoney = ExcelMethodGroup.WithdrawMoneyXLSX(this, AmountOfMoney, tempDesAmount);
+                return AmountOfMoney = XmlMethodGroup.WithdrawMoneyXml(this, AmountOfMoney, tempDesAmount);
             }
             //money check
             if (desiredAmount > AmountOfMoney)
@@ -211,14 +255,16 @@ namespace BankSystem
                 return -1;
             }
             else
-                return AmountOfMoney = ExcelMethodGroup.WithdrawMoneyXLSX(this, AmountOfMoney, desiredAmount);
+                //Excel method
+                //return AmountOfMoney = ExcelMethodGroup.WithdrawMoneyXLSX(this, AmountOfMoney, desiredAmount);
+                return AmountOfMoney = XmlMethodGroup.WithdrawMoneyXml(this, AmountOfMoney, desiredAmount);
         }
         /// <summary>
         /// Check length login and password
         /// </summary>
         /// <param name="account"></param>
         /// <returns></returns>
-        private static bool CheckLength(Account account)
+        private static bool CheckLengthLoginAndPassword(Account account)
         {
             Type? type = typeof(Account);
             object[] attributes = type.GetCustomAttributes(false);
@@ -226,10 +272,10 @@ namespace BankSystem
             {
                 if (attr is CheckLengthLoginPasswordAttribute attribute)
                 {
-                    if (attribute.Length > account.Login.Length)
+                    if (attribute.Length > account.Login.Length && attribute.Length > account.Password.Length)
+                        return true;
+                    else if (attribute.Length < account.Login.Length)
                     {
-                        if (attribute.Length > account.Password.Length)
-                            return true;
                         MessageInformant.ErrorOutput($"Length Login must be less {attribute.Length}");
                         return false;
                     }
@@ -242,5 +288,6 @@ namespace BankSystem
             }
             return true;
         }
+
     }
 }

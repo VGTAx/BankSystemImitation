@@ -13,7 +13,7 @@ namespace BankSystem
             get { return Name; }            
         }
         private List<IAccount> Accounts { get { return new List<IAccount>(); }  }
-        private List<IBankomat> Bankomats { get { return new List<IBankomat>(); } }
+        private List<IATM> Bankomats { get { return new List<IATM>(); } }
 
         private void SighUp()  { }
         private void SignIn() { }

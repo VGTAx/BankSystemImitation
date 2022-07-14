@@ -1,5 +1,4 @@
 ﻿using InitHelperInformatMessage;
-using System.Diagnostics;
 
 namespace BankSystem
 {
@@ -10,24 +9,24 @@ namespace BankSystem
         private Dictionary<EnumManageBank, Manage> DictManageBank;
         private Dictionary<EnumManageClient, Manage> DictManageClient;
         private Dictionary<EnumManageMain, Manage> DictManageMain;
-        private Dictionary<EnumManageAccountClient, Manage> DictManageAccountClient;        
+        private Dictionary<EnumManageAccountClient, Manage> DictManageAccountClient;
 
         public Bank()
         {
             Name = String.Empty;
             Accounts = new List<IAccount>();
-            Bankomats = new List<IBankomat>();
+            ATM = new List<IATM>();
         }
-        public Bank(string name, List<IAccount> acc, List<IBankomat> atm)
+        public Bank(string name, List<IAccount> acc, List<IATM> atm)
         {
             Name = name;
             Accounts = acc;
-            Bankomats = atm;
+            ATM = atm;
         }
 
         private string Name { get; set; }
         private List<IAccount> Accounts { get; set; }
-        private List<IBankomat> Bankomats { get; set; }
+        private List<IATM> ATM { get; set; }
         /// <summary>
         /// Sign Up account of client
         /// </summary>
@@ -46,11 +45,14 @@ namespace BankSystem
             Console.Clear();
             int attemptCount = 3;//attemp count
             bool check = false;
-            Accounts = ExcelMethodGroup.LoadListAccXLSX();
+            //Accounts = ExcelMethodGroup.LoadListAccXLSX();
+            Accounts = XmlMethodGroup.LoadXmlListAccount();
+
             //checking for accounts
             if (Accounts == null | Accounts.Count == 0)
             {
                 MessageInformant.ErrorOutput("There is no Account. Sigh Up account first!");
+                Console.ReadLine();
                 check = true;
             }
             while (!check)
@@ -95,88 +97,81 @@ namespace BankSystem
 
             foreach (var item in client)
             {
-                item.AddMoney();
-                //MessageInformant.SuccessOutput("Money added to account!");
+                //item.AddMoney();
+                item.AddMoneyXml();
+                MessageInformant.SuccessOutput("Money added to account!");
             }
         }
         /// <summary>
         /// Withdraw money by client
         /// </summary>
-        private void TakeMoney()
+        private void WithdrawMoney()
         {
             //Finding an "Authorization Key"
-            var clientTakeMoney = from p in Accounts where p.Authorization == true select p;
-
-            foreach (var accAUTH in clientTakeMoney)
+            var clientWithdrawMoney = from p in Accounts
+                                      where p.Authorization == true && p.AmountOfMoney != 0
+                                      select p;
+            if (clientWithdrawMoney.Any() == false)
             {
-                //checking if the client has money
-                if (accAUTH.AmountOfMoney != 0)
+                //while client has not money
+                MessageInformant.ErrorOutput($"You have 0 BYN. Top up your account!");
+                Console.ReadLine();
+            }
+            foreach (var accAUTH in clientWithdrawMoney)
+            {
+                //select where withdraw money
+                Console.Write("Select where do you wish to withdraw money:\n1.Bank\n2.ATM\n");
+                string enter = Console.ReadLine();
+                switch (enter)
                 {
-                    while (true)
-                    {
-                        //select where withdraw money
-                        Console.Write("Select where do you wish to withdraw money:\n1.Bank\n2.ATM\n");
-                        string enter = Console.ReadLine();
-                        switch (enter)
+                    case "1":
+                        accAUTH.TakeMoneyXml();
+                        MessageInformant.SuccessOutput($"Money withdrawn!");
+                        Console.ReadLine();
+                        break;
+                    case "2":
+                        ///checking if the bank has ATM (Excel file database)
+                        //ATM = ExcelMethodGroup.LoadListAtmXLSX();
+
+                        ///checking if the bank has ATM (Xml file database)
+                        ATM = XmlMethodGroup.LoadXmlListAtm();
+                        if (ATM.Count == 0)
                         {
-                            case "1":
-                                accAUTH.TakeMoneyAsync();
+                            MessageInformant.ErrorOutput("There is no ATM. Add ATM first!");
+                            Console.ReadLine();
+                            break;
+                        }
+                        while (ATM.Count != 0)
+                        {
+                            ///get list ATM
+                            foreach (var atm in ATM)
+                            {
+                                atm.Info();
+                            }
+                            ///select ATM
+                            Console.Write("\nSelect ATM to withdraw money (");
+                            int tempATM = (int)InitializationHelper.DoubleInit("№ATM) or 0 to exit");
+                            ///request to find an ATM
+                            var atmSelect = from p in ATM where p.NumberATM == tempATM select p;
+
+                            foreach (var authATM in atmSelect)
+                            {
+                                authATM.WithdrawMoney(accAUTH);
                                 MessageInformant.SuccessOutput($"Money withdrawn!");
                                 Console.ReadLine();
+                            }
+                            if (atmSelect.Any() || tempATM == 0)
+                            {
                                 break;
-                            case "2":                                
-                                while (true)
-                                {   //checking if the bank has ATM
-                                    Bankomats = ExcelMethodGroup.LoadListAtmXLSX();
-                                    if (Bankomats.Count == 0)
-                                    {
-                                        MessageInformant.ErrorOutput("There is no ATM. Add ATM first!");
-                                        Console.ReadLine();
-                                        break;
-                                    }
+                            }
 
-                                    while (true)
-                                    {   
-                                        //get list ATM
-                                        foreach (var atm in Bankomats)
-                                        {
-                                            atm.Info();
-                                        }
-                                        //select ATM
-                                        Console.Write("\nSelect ATM to withdraw money (");
-                                        int tempATM = (int)InitializationHelper.DoubleInit("№ATM)");
-                                        //request to find an ATM
-                                        var atmSelect = from p in Bankomats where p.NumberATM == tempATM select p;
-
-                                        foreach (var authATM in atmSelect)
-                                        {
-                                            authATM.WithdrawMoney(accAUTH);
-                                            MessageInformant.SuccessOutput($"Money withdrawn!");
-                                            Console.ReadLine();
-                                        }
-                                        if (atmSelect.Any())
-                                        {
-                                            break;
-                                        }
-
-                                        MessageInformant.ErrorOutput("Invalid ATM Number!");
-                                        Console.ReadLine();
-                                        Console.Clear();
-                                    }
-                                    break;
-                                }
-                                break;
+                            MessageInformant.ErrorOutput("Invalid ATM Number!");
+                            Console.ReadLine();
+                            Console.Clear();
                         }
                         break;
-                    }
                 }
-                else
-                {
-                    //while client has not money
-                    MessageInformant.ErrorOutput($"You have {accAUTH.AmountOfMoney} BYN. Top up your account!");
-                    Console.ReadLine();
-                }
-            } 
+            }
         }
         /// <summary>
         /// Get information about the client
@@ -197,9 +192,9 @@ namespace BankSystem
         /// </summary>
         private void AddATM()
         {
-            Bankomat atm = new Bankomat();
-            atm.CreateATM(Bankomats);
-            Bankomats.Add(atm);
+            ATM atm = new ATM();
+            atm.CreateATM(ATM);
+            ATM.Add(atm);
             MessageInformant.SuccessOutput("ATM Add!");
             Console.Clear();
         }
@@ -209,10 +204,11 @@ namespace BankSystem
         private void GetAllATM()
         {
             Console.Clear();
-            Bankomats = ExcelMethodGroup.LoadListAtmXLSX();
-            if (Bankomats.Count != 0)
+            //ATM = ExcelMethodGroup.LoadListAtmXLSX();
+            ATM = XmlMethodGroup.LoadXmlListAtm();
+            if (ATM.Count != 0)
             {
-                var listATM = from p in Bankomats select p;
+                var listATM = from p in ATM select p;
 
                 foreach (var item in listATM)
                 {
@@ -232,18 +228,19 @@ namespace BankSystem
         private void LoadMoneyATM()
         {
             bool check = false;
-            Bankomats = ExcelMethodGroup.LoadListAtmXLSX();
-            while (Bankomats.Count != 0)
+            //ATM = ExcelMethodGroup.LoadListAtmXLSX();
+            ATM = XmlMethodGroup.LoadXmlListAtm();
+            while (ATM.Count != 0)
             {
                 GetAllATM();
                 Console.WriteLine();
                 int ATM = InitializationHelper.IntInit("number ATM");
 
-                var selectATM = from p in Bankomats where p.NumberATM == ATM select p;//search entered ATM
+                var selectATM = from p in this.ATM where p.NumberATM == ATM select p;//search entered ATM
 
                 foreach (var atm in selectATM)
                 {
-                    atm.LoadMoney();
+                    atm.LoadMoneyXml();
                     check = true;
                 }
 
@@ -260,7 +257,7 @@ namespace BankSystem
                     Console.ReadLine();
                 }
             }
-            if (Bankomats.Count == 0)
+            if (ATM.Count == 0)
             {
                 MessageInformant.ErrorOutput("There is no ATM. Add ATM first!");
                 Console.ReadLine();
@@ -277,10 +274,10 @@ namespace BankSystem
             DictManageAccountClient = new Dictionary<EnumManageAccountClient, Manage>
             {
                 {EnumManageAccountClient.AddMoney, new Manage(AddMoney) },
-                {EnumManageAccountClient.TakeMoney, new Manage(TakeMoney) },
+                {EnumManageAccountClient.TakeMoney, new Manage(WithdrawMoney) },
                 {EnumManageAccountClient.GetInfo, new Manage(GetInfoClient) }
-            };            
-           
+            };
+
             while (true)
             {
                 Console.Clear();
@@ -327,7 +324,7 @@ namespace BankSystem
                 {EnumManageBank.LoadMoneyATM, new Manage(LoadMoneyATM) }
             };
             Console.Clear();
-            
+
             while (true)
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -338,7 +335,7 @@ namespace BankSystem
                 //enum available method
                 foreach (int item in Enum.GetValues(typeof(EnumManageBank)))
                 {
-                    Console.WriteLine($"{(int)item}.{(EnumManageBank)item}");
+                    Console.WriteLine($"{item}.{(EnumManageBank)item}");
                 }
                 bool result = Enum.TryParse(Console.ReadLine(), out EnumManageBank select);
 
@@ -354,7 +351,7 @@ namespace BankSystem
                 catch (Exception)
                 {
                     MessageInformant.ErrorOutput("Invalid select");
-                    Thread.Sleep(400);
+                    Console.ReadLine();
                 }
             }
         }
@@ -369,7 +366,7 @@ namespace BankSystem
             {
                 {EnumManageClient.SighUp, new Manage(SighUp) },
                 {EnumManageClient.SignIn, new Manage(SignIn) },
-            };   
+            };
 
             while (true)
             {
@@ -412,7 +409,7 @@ namespace BankSystem
             {
                 {EnumManageMain.Client,new Manage(ManageClient)},
                 {EnumManageMain.Bank,new Manage(ManageBank)}
-            };            
+            };
 
             while (true)
             {
@@ -428,7 +425,7 @@ namespace BankSystem
                     Console.WriteLine($"{(int)item}.{(EnumManageMain)item}");
                 }
                 bool result = Enum.TryParse(Console.ReadLine(), out EnumManageMain select);
-                
+
                 //passing selected method to delegate
                 try
                 {
@@ -443,12 +440,11 @@ namespace BankSystem
                     }
                     DictManageMain[select]();
                 }
-                catch 
+                catch
                 {
                     MessageInformant.ErrorOutput("Invalid select");
                     Console.ReadLine();
                 }
-                
             }
         }
     }
